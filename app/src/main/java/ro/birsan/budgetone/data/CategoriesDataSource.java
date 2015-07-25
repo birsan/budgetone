@@ -43,9 +43,9 @@ public class CategoriesDataSource {
         return readableDatabase.query(MySQLiteHelper.TABLE_CATEGORIES, allColumns, selection, selectionArgs, null, null, null);
     }
 
-    public List<Category> getAllCategories() {
+    public List<Category> getCategories(String selection, String[] selectionArgs) {
         List<Category> comments = new ArrayList<>();
-        Cursor cursor = readableDatabase.query(MySQLiteHelper.TABLE_CATEGORIES, allColumns, null, null, null, null, null);
+        Cursor cursor = getCursor(selection, selectionArgs);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             comments.add(cursorToComment(cursor));

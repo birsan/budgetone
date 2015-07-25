@@ -1,44 +1,45 @@
 package ro.birsan.budgetone;
 
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Contacts;
-import android.provider.ContactsContract;
-import android.support.v4.app.ListFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.Toast;
 
-public class BudgetListFragment extends ListFragment {
+import ro.birsan.budgetone.data.Budget;
+import ro.birsan.budgetone.data.BudgetsDataSource;
+
+public class BudgetListFragment extends Fragment {
 
     private SimpleCursorAdapter _adapter;
+    private ListView _listView;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_budget, container, false);
+    }
 
-        super.onCreate(savedInstanceState);
-        String[] fromColumns = {ContactsContract.Data.DISPLAY_NAME};
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        BudgetsDataSource budgetsDataSource = new BudgetsDataSource(getActivity());
+
+        String[] fromColumns = {Budget.TABLE_BUDGETS_COLUMN_AMOUNT};
         int[] toViews = {R.id.category_name};
 
-        Uri phone_contacts = ContactsContract.Data.CONTENT_URI;
-        String[] projection = new String[] {ContactsContract.Data._ID, ContactsContract.Data.DISPLAY_NAME };
-        Cursor cursor = getActivity().getContentResolver().query(phone_contacts, projection, null, null, ContactsContract.Data.DISPLAY_NAME + " ASC");
+        ImageButton fabImageButton = (ImageButton) getActivity().findViewById(R.id.fab_image_button);
+        _listView = (ListView)getActivity().findViewById(R.id.list);
+        _adapter = new SimpleCursorAdapter(getActivity(), R.layout.budget_list_item, budgetsDataSource.getCurrentBudget(), fromColumns, toViews, 0);
+        _listView.setAdapter(_adapter);
 
-        _adapter = new SimpleCursorAdapter(getActivity(), R.layout.budget_list_item, cursor, fromColumns, toViews, 0);
-        setListAdapter(_adapter);
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        getListView().setDivider(null);
-    }
-
-    @Override
-    public void onListItemClick(ListView lv, View v, int position, long id){
-        Cursor item = (Cursor)_adapter.getItem(position);
-        Toast.makeText(getActivity(), item.getString(1), Toast.LENGTH_SHORT).show();
+        fabImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            }
+        });
     }
 }

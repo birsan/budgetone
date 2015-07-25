@@ -94,6 +94,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(TABLE_CATEGORIES_CREATE);
         db.execSQL(POPULATE_TABLE_CATEGORIES);
+        db.execSQL(Budget.TABLE_BUDGETS_CREATE);
     }
 
     @Override
