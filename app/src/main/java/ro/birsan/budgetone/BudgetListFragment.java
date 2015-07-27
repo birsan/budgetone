@@ -39,6 +39,8 @@ public class BudgetListFragment extends Fragment {
         fabImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                DialogAddBudget dialogAddBudget = new DialogAddBudget();
+                dialogAddBudget.show(getActivity().getFragmentManager(), "add_budget");
             }
         });
     }
