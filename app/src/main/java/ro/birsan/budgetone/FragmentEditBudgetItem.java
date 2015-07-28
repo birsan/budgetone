@@ -16,61 +16,58 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import ro.birsan.budgetone.widgets.CategoryBudgetSeekBar;
+
 /**
  * Created by Irinel on 7/27/2015.
  */
 public class FragmentEditBudgetItem extends Fragment {
-    private SeekBar Seekbar = null;
+    private CategoryBudgetSeekBar Seekbar = null;
     private RelativeLayout RelativeLayout = null;
-
-    public FragmentEditBudgetItem() {
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_edit_budget_item, container, false);
+        RelativeLayout = (RelativeLayout) view.findViewById(R.id.intervals);
+        Seekbar = (CategoryBudgetSeekBar) view.findViewById(R.id.seekbar);
+        setIntervals(new ArrayList<String>() {{
+            add("1");
+            add("3");
+            add("5");
+            add("7");
+            add("9");
+        }});
         return view;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setIntervals(new ArrayList<String>() {{
-            add("1");
-            add("aaa");
-            add("3");
-            add("bbb");
-            add("5");
-            add("ccc");
-            add("7");
-            add("ddd");
-            add("9");
-        }});
     }
 
     public void setIntervals(List<String> intervals) {
         displayIntervals(intervals);
-        getSeekbar().setMax(intervals.size() - 1);
+        Seekbar.setMax(intervals.size() - 1);
     }
 
     private void displayIntervals(List<String> intervals) {
         int idOfPreviousInterval = 0;
 
-        if (getRelativeLayout().getChildCount() == 0) {
+        if (RelativeLayout.getChildCount() == 0) {
             for (String interval : intervals) {
                 TextView textViewInterval = createInterval(interval);
                 alignTextViewToRightOfPreviousInterval(textViewInterval, idOfPreviousInterval);
 
                 idOfPreviousInterval = textViewInterval.getId();
 
-                getRelativeLayout().addView(textViewInterval);
+                RelativeLayout.addView(textViewInterval);
             }
         }
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     private TextView createInterval(String interval) {
-        EditText textBoxView = new EditText(getActivity());
+        TextView textBoxView = new TextView(getActivity());
         textBoxView.setId(View.generateViewId());
         textBoxView.setText(interval);
 
@@ -86,21 +83,5 @@ public class FragmentEditBudgetItem extends Fragment {
         }
 
         textView.setLayoutParams(params);
-    }
-
-    private RelativeLayout getRelativeLayout() {
-        if (RelativeLayout == null) {
-            RelativeLayout = (RelativeLayout) getActivity().findViewById(R.id.intervals);
-        }
-
-        return RelativeLayout;
-    }
-
-    private SeekBar getSeekbar() {
-        if (Seekbar == null) {
-            Seekbar = (SeekBar) getActivity().findViewById(R.id.seekbar);
-        }
-
-        return Seekbar;
     }
 }
