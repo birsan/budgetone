@@ -3,7 +3,6 @@ package ro.birsan.budgetone.data;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -12,16 +11,10 @@ import java.util.List;
 /**
  * Created by Irinel on 7/25/2015.
  */
-public class BudgetsDataSource {
-    private SQLiteDatabase _writableDatabase;
-    private SQLiteDatabase _readableDatabase;
-    private MySQLiteHelper _dbHelper;
+public class BudgetsDataSource extends DataSourceBase {
 
     public BudgetsDataSource(Context context) {
-
-        _dbHelper = new MySQLiteHelper(context);
-        _writableDatabase = _dbHelper.getWritableDatabase();
-        _readableDatabase = _dbHelper.getReadableDatabase();
+        super(context);
     }
 
     public List<Budget> cursorToList(Cursor cursor) {

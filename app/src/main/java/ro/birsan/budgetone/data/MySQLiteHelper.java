@@ -95,6 +95,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         db.execSQL(TABLE_CATEGORIES_CREATE);
         db.execSQL(POPULATE_TABLE_CATEGORIES);
         db.execSQL(Budget.TABLE_BUDGETS_CREATE);
+        db.execSQL(Income.TABLE_INCOMES_CREATE);
     }
 
     @Override

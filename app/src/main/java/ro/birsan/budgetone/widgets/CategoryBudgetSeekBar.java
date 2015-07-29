@@ -17,15 +17,19 @@ import android.widget.SeekBar;
  * Created by Irinel on 7/28/2015.
  */
 public class CategoryBudgetSeekBar extends SeekBar {
-    private Bitmap _labelBackground;
+    /*private Bitmap _labelBackground;
     private int _viewWidth, _barHeight, _labelOffset;;
     private Rect _barBounds, _labelTextRect;
     private float _progressPosX;
     private Point _labelPos;
     private Drawable _progressDrawable;
-    private Paint _labelTextPaint, _labelBackgroundPaint;
+    private Paint _labelTextPaint, _labelBackgroundPaint;*/
 
     public CategoryBudgetSeekBar(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    /*public CategoryBudgetSeekBar(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         _progressDrawable = getProgressDrawable();
@@ -43,9 +47,9 @@ public class CategoryBudgetSeekBar extends SeekBar {
         _labelTextRect = new Rect();
 
         _labelPos = new Point();
-    }
+    }*/
 
-    @Override
+    /*@Override
     protected synchronized void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
     {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
@@ -57,9 +61,9 @@ public class CategoryBudgetSeekBar extends SeekBar {
             //setMeasuredDimension(_viewWidth, _barHeight + _labelBackground.getHeight());
         setMeasuredDimension(_viewWidth, _barHeight + 15);
         //}
-    }
+    }*/
 
-    @Override
+    /*@Override
     protected synchronized void onDraw(Canvas canvas) {
         canvas.save();
         //if (_labelBackground != null) {
@@ -91,9 +95,9 @@ public class CategoryBudgetSeekBar extends SeekBar {
         //} else {
             //super.onDraw(canvas);
         //}
-    }
+    }*/
 
-    public Bitmap drawableToBitmap(Drawable drawable) {
+    /*public Bitmap drawableToBitmap(Drawable drawable) {
         if (drawable instanceof BitmapDrawable) {
             return ((BitmapDrawable) drawable).getBitmap();
         }
@@ -105,5 +109,5 @@ public class CategoryBudgetSeekBar extends SeekBar {
         drawable.draw(canvas);
 
         return bitmap;
-    }
+    }*/
 }

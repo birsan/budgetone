@@ -2,6 +2,7 @@ package ro.birsan.budgetone;
 
 import android.app.Activity;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -16,6 +17,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.widget.Toast;
 
 import ro.birsan.budgetone.data.CategoriesDataSource;
+import ro.birsan.budgetone.data.IncomesDataSource;
 
 
 public class Dashboard extends AppCompatActivity
@@ -36,6 +38,7 @@ public class Dashboard extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        PlaceholderFragment._context = this;
         setContentView(R.layout.activity_dashboard);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -126,6 +129,9 @@ public class Dashboard extends AppCompatActivity
      * A placeholder fragment containing a simple view.
      */
     public static class PlaceholderFragment extends Fragment {
+
+        public static Context _context;
+
         /**
          * The fragment argument representing the section number for this
          * fragment.
@@ -137,7 +143,14 @@ public class Dashboard extends AppCompatActivity
          * number.
          */
         public static Fragment newInstance(int sectionNumber) {
-            if (sectionNumber == 1) return new BudgetListFragment();
+            if (sectionNumber == 1) {
+                IncomesDataSource incomesDataSource = new IncomesDataSource(_context);
+                if (incomesDataSource.getCurrentMonthIncome().getCount() == 0){
+                    return new NoMonthIncomeFragment();
+                }
+
+                return new BudgetListFragment();
+            }
             if (sectionNumber == 2) return new CategoryFragment();
 
             PlaceholderFragment fragment = new PlaceholderFragment();
