@@ -28,6 +28,16 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="15dp"
         android:autoLink="all"
-        android:layout_below="@+id/title" />
+        android:layout_below="@+id/title"
+        android:clickable="true" />
+
+    <ro.birsan.budgetone.widgets.ContextualEditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtNewIncome"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="150dp"
+        android:visibility="invisible"
+        android:hint="@string/add_income_hint1"/>
 
 </RelativeLayout>

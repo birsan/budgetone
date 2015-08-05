@@ -1,5 +1,6 @@
 package ro.birsan.budgetone.data;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
@@ -16,6 +17,16 @@ public class IncomesDataSource extends DataSourceBase {
         super(context);
     }
 
+    public void addIncome(double amount, String source) {
+        Calendar c = Calendar.getInstance();
+        ContentValues values = new ContentValues();
+        values.put(Income.TABLE_INCOMES_COLUMN_AMOUNT, amount);
+        values.put(Income.TABLE_INCOMES_COLUMN_CATEGORY, source);
+        values.put(Income.TABLE_INCOMES_COLUMN_MONTH, c.get(Calendar.MONTH));
+        values.put(Income.TABLE_INCOMES_COLUMN_YEAR, c.get(Calendar.YEAR));
+        _writableDatabase.insert(Income.TABLE_INCOMES, null, values);
+    }
+
     public Cursor getCurrentMonthIncome() {
         Calendar c = Calendar.getInstance();
         return getIncome(c.get(Calendar.MONTH), c.get(Calendar.YEAR));
@@ -28,6 +39,18 @@ public class IncomesDataSource extends DataSourceBase {
                 Income.TABLE_INCOMES_COLUMN_MONTH + " == ? AND " + Income.TABLE_INCOMES_COLUMN_YEAR + " == ?",
                 new String[]{Integer.valueOf(month).toString(), Integer.valueOf(year).toString()},
                 null, null, null);
+    }
+
+    /**
+     * @return current available amount computed as sum of all incomes minus sum of all transactions.
+     */
+    public double getCurrentAmount() {
+        double allTransactionsValue = 0;
+        Cursor cursor = _readableDatabase.rawQuery("SELECT sum(" + Income.TABLE_INCOMES_COLUMN_AMOUNT + ") from " + Income.TABLE_INCOMES + ";", null);
+        cursor.moveToFirst();
+        double amount = cursor.getDouble(0) - allTransactionsValue;
+        cursor.close();
+        return amount;
     }
 
     public List<Income> cursorToList(Cursor cursor) {
