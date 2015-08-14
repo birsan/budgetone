@@ -29,7 +29,9 @@
         android:layout_marginTop="15dp"
         android:autoLink="all"
         android:layout_below="@+id/title"
-        android:clickable="true" />
+        android:clickable="true"
+        android:textColor="#2c3e50"
+        android:textColorLink="#2c3e50" />
 
     <ro.birsan.budgetone.widgets.ContextualEditText
         android:layout_width="fill_parent"

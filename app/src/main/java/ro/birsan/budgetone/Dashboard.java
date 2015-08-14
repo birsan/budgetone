@@ -1,11 +1,9 @@
 package ro.birsan.budgetone;
 
 import android.app.Activity;
-import android.app.DialogFragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -16,12 +14,18 @@ import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.Toast;
 
+import java.util.List;
+
+import ro.birsan.budgetone.data.Budget;
+import ro.birsan.budgetone.data.BudgetsDataSource;
 import ro.birsan.budgetone.data.CategoriesDataSource;
 import ro.birsan.budgetone.data.IncomesDataSource;
+import ro.birsan.budgetone.util.IncomeParser;
+import ro.birsan.budgetone.widgets.IIncomeGatherer;
 
 
 public class Dashboard extends AppCompatActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks, SaveCategoryDialogFragment.SaveCategoryDialogListener {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks, SaveCategoryDialogFragment.SaveCategoryDialogListener, IIncomeGatherer.IIncomeGathererListener {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -34,6 +38,8 @@ public class Dashboard extends AppCompatActivity
     private CharSequence mTitle;
 
     private int mPosition;
+
+    private Fragment _currentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,20 +63,25 @@ public class Dashboard extends AppCompatActivity
     }
 
     public void onSectionAttached(int number) {
-        switch (number) {
-            case 1:
-                mTitle = getString(R.string.title_section_dashboard);
-                break;
-            case 2:
-                mTitle = getString(R.string.title_section_categories);
-                break;
-            case 3:
-                mTitle = getString(R.string.title_section3);
-                break;
-        }
+        restoreActionBar();
     }
 
     public void restoreActionBar() {
+
+        switch (mPosition) {
+            case 0:
+                IncomesDataSource incomesDataSource = new IncomesDataSource(this);
+                BudgetsDataSource budgetsDataSource = new BudgetsDataSource(this);
+                mTitle = String.valueOf(budgetsDataSource.getCurrentMonthBudgetedAmount()) + "/" + String.valueOf(incomesDataSource.getCurrentAmount());
+                break;
+            case 1:
+                mTitle = getString(R.string.title_section_categories);
+                break;
+            case 2:
+                mTitle = getString(R.string.title_section3);
+                break;
+        }
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
@@ -84,7 +95,13 @@ public class Dashboard extends AppCompatActivity
             // Only show items in the action bar relevant to this screen
             // if the drawer is not showing. Otherwise, let the drawer
             // decide what to show in the action bar.
-            getMenuInflater().inflate(R.menu.dashboard, menu);
+
+            switch (mPosition) {
+                case 0:
+                    getMenuInflater().inflate(R.menu.dashboard, menu);
+                    break;
+            }
+
             restoreActionBar();
             return true;
         }
@@ -103,10 +120,25 @@ public class Dashboard extends AppCompatActivity
             return true;
         }
 
-        if (id == R.id.action_example) {
-            DialogFragment saveCategoryDialogFragment = new SaveCategoryDialogFragment();
-            saveCategoryDialogFragment.show(getFragmentManager(), "a tag");
-            return true;
+        if (id == R.id.add_income) {
+            if (_currentFragment instanceof IIncomeGatherer)
+            {
+                ((IIncomeGatherer) _currentFragment).showIncomeTextBox();
+            }
+            /*DrawerLayout drawerLayout =  (DrawerLayout)((ViewGroup)getWindow().getDecorView().findViewById(android.R.id.content)).getChildAt(0);
+            View fragmentView = ((FrameLayout)drawerLayout.getChildAt(0)).getChildAt(0);
+            if (fragmentView instanceof RelativeLayout)
+            {
+                ContextualEditText contextualEditText = new ContextualEditText(this, null);
+                contextualEditText.setVisibility(View.INVISIBLE);
+                contextualEditText.setHint("XXXX");
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                params.bottomMargin = 50;
+                params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+                ((RelativeLayout) fragmentView).addView(contextualEditText, params);
+                contextualEditText.show();
+            }
+            return true;*/
         }
 
         return super.onOptionsItemSelected(item);
@@ -115,16 +147,35 @@ public class Dashboard extends AppCompatActivity
     @Override
     public void onSaveCategory(int categoryId, String categoryName) {
         CategoriesDataSource categoriesDataSource = new CategoriesDataSource(this);
-        categoriesDataSource.open();
         categoriesDataSource.createCategory(categoryName);
         ShowRefreshFragment(mPosition);
     }
 
     private void ShowRefreshFragment(int position) {
+        _currentFragment = PlaceholderFragment.newInstance(position);
+        if (_currentFragment instanceof IIncomeGatherer) {
+            ((IIncomeGatherer) _currentFragment).setOnIncomeAddedListener(this);
+        }
+
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+                .replace(R.id.container, _currentFragment)
                 .commit();
     }
+
+    @Override
+    public void onAddIncome(String income) {
+        IncomeParser incomeParser = new IncomeParser(income);
+        if (!incomeParser.isValid()) {
+            Toast.makeText(this, R.string.err_invalid_income_input, Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        IncomesDataSource incomesDataSource = new IncomesDataSource(this);
+        incomesDataSource.addIncome(incomeParser.getAmount(), incomeParser.getSource());
+        restoreActionBar();
+        Toast.makeText(this, R.string.add_income_success, Toast.LENGTH_LONG).show();
+    }
+
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -143,15 +194,21 @@ public class Dashboard extends AppCompatActivity
          * number.
          */
         public static Fragment newInstance(int sectionNumber) {
-            if (sectionNumber == 1) {
+            if (sectionNumber == 0) {
                 IncomesDataSource incomesDataSource = new IncomesDataSource(_context);
-                if (incomesDataSource.getCurrentMonthIncome().getCount() == 0){
+                if (incomesDataSource.getCurrentAmount() <= 0){
                     return new NoMonthIncomeFragment();
+                }
+
+                BudgetsDataSource budgetsDataSource = new BudgetsDataSource(_context);
+                List<Budget> budgetItems = budgetsDataSource.cursorToList(budgetsDataSource.getCurrentMonthBudget());
+                if (budgetItems.size() == 0) {
+                    return new NoBudgetFragment();
                 }
 
                 return new BudgetListFragment();
             }
-            if (sectionNumber == 2) return new CategoryFragment();
+            if (sectionNumber == 1) return new CategoryFragment();
 
             PlaceholderFragment fragment = new PlaceholderFragment();
             Bundle args = new Bundle();

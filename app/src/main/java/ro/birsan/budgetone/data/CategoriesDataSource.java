@@ -21,9 +21,6 @@ public class CategoriesDataSource {
 
     public CategoriesDataSource(Context context) {
         dbHelper = new MySQLiteHelper(context);
-    }
-
-    public void open() throws SQLException {
         writableDatabase = dbHelper.getWritableDatabase();
         readableDatabase = dbHelper.getReadableDatabase();
     }

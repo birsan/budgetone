@@ -52,7 +52,6 @@ public class CategoryFragment extends Fragment {
     private List<Category> getData()
     {
         CategoriesDataSource categoriesDataSource = new CategoriesDataSource(getActivity());
-        categoriesDataSource.open();
         List<Category> categories = categoriesDataSource.getCategories(MySQLiteHelper.TABLE_CATEGORIES_COLUMN_PARENT_CATEGORY + " IS NULL ", null);
         for (int i = 0; i < categories.size(); i++)
         {

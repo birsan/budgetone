@@ -26,4 +26,12 @@
         android:elevation="@dimen/elevation_low"
         android:stateListAnimator="@anim/button_elevation"/>
 
+    <ro.birsan.budgetone.widgets.ContextualEditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtNewIncome"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="15dp"
+        android:visibility="invisible"
+        android:hint="@string/add_income_hint1"/>
 </RelativeLayout>

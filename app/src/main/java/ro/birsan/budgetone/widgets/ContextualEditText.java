@@ -29,6 +29,7 @@ public class ContextualEditText extends EditText {
     {
         if (getVisibility() == View.VISIBLE) return;
         setVisibility(View.VISIBLE);
+        requestFocus();
         InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT);
     }
@@ -55,6 +56,9 @@ public class ContextualEditText extends EditText {
     public boolean onKeyPreIme(int keyCode, KeyEvent event) {
         if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
             this.setVisibility(View.INVISIBLE);
+            for (ContextualEditTextActionListener listener : _listeners) {
+                listener.onHide();
+            }
             return super.dispatchKeyEvent(event);
         }
         return super.dispatchKeyEvent(event);
@@ -63,5 +67,6 @@ public class ContextualEditText extends EditText {
     public interface ContextualEditTextActionListener
     {
         void onSend(String value);
+        void onHide();
     }
 }

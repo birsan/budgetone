@@ -28,7 +28,7 @@ public class BudgetsDataSource extends DataSourceBase {
         return budget;
     }
 
-    public Cursor getCurrentBudget() {
+    public Cursor getCurrentMonthBudget() {
         Calendar c = Calendar.getInstance();
         return _readableDatabase.query(
                 Budget.TABLE_BUDGETS,
@@ -36,6 +36,15 @@ public class BudgetsDataSource extends DataSourceBase {
                 Budget.TABLE_BUDGETS_COLUMN_MONTH + " == ? AND " + Budget.TABLE_BUDGETS_COLUMN_YEAR + " == ?",
                 new String[]{String.valueOf(c.get(Calendar.MONTH)), String.valueOf(c.get(Calendar.YEAR))},
                 null, null, null);
+    }
+
+    public double getCurrentMonthBudgetedAmount() {
+        Calendar c = Calendar.getInstance();
+        Cursor cursor = _readableDatabase.rawQuery("SELECT sum(" + Budget.TABLE_BUDGETS_COLUMN_AMOUNT + ") from " + Budget.TABLE_BUDGETS + " WHERE " + Budget.TABLE_BUDGETS_COLUMN_MONTH + " = " + c.get(Calendar.MONTH)  + " AND " + Budget.TABLE_BUDGETS_COLUMN_YEAR + " = " + c.get(Calendar.YEAR) + ";", null);
+        cursor.moveToFirst();
+        double amount = cursor.getDouble(0);
+        cursor.close();
+        return amount;
     }
 
     public Budget addBudgetForCurrentMonth(long categoryId, float amount) {

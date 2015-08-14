@@ -3,14 +3,11 @@
 
     <string name="title_section_dashboard">Dashboard</string>
     <string name="title_section_categories">Categories</string>
+    <string name="title_activity_select_categories">Select Categories</string>
     <string name="title_section3">Section 3</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-
-    <string name="action_example">Example action</string>
-
-    <string name="action_settings">Settings</string>
 
 <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
@@ -21,4 +18,16 @@
     <string name="save_category_dialog_cancel_btn">Cancel</string>
     <string name="add_income">Add Income</string>
     <string name="add_income_hint1">2500 @salary</string>
+    <string name="add_income_success">Income added</string>
+
+    <!-- menus -->
+    <string name="action_save">Save</string>
+    <string name="action_example">Example action</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- errors -->
+    <string name="err_invalid_income_input">Invalid input</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_copy_last_month_budget">CopyLastMonthBudgetActivity</string>
 </resources>
