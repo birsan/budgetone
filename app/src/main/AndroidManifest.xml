@@ -21,7 +21,8 @@
         <activity
             android:name=".SelectCategoriesActivity"
             android:label="@string/title_activity_select_categories"
-            android:parentActivityName=".Dashboard">
+            android:parentActivityName=".Dashboard" >
+
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -30,6 +31,14 @@
         <activity
             android:name=".CopyLastMonthBudgetActivity"
             android:label="@string/title_activity_copy_last_month_budget" >
+        </activity>
+        <activity
+            android:name=".AddIncomeActivity"
+            android:label="@string/title_activity_add_income"
+            android:parentActivityName=".Dashboard">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ro.birsan.budgetone.Dashboard" />
         </activity>
     </application>
 

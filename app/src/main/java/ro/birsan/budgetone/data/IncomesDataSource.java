@@ -41,6 +41,20 @@ public class IncomesDataSource extends DataSourceBase {
                 null, null, null);
     }
 
+    public List<String> getCategories() {
+        List<String> categories = new ArrayList();
+        Cursor cursor = _readableDatabase.rawQuery("SELECT DISTINCT " + Income.TABLE_INCOMES_COLUMN_CATEGORY + " from " + Income.TABLE_INCOMES + ";", null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            if (!categories.contains(cursor.getString(0))) {
+                categories.add(cursor.getString(0));
+            }
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return categories;
+    }
+
     /**
      * @return current available amount computed as sum of all incomes minus sum of all transactions.
      */
@@ -53,7 +67,7 @@ public class IncomesDataSource extends DataSourceBase {
         return amount;
     }
 
-    public List<Income> cursorToList(Cursor cursor) {
+    public static List<Income> cursorToList(Cursor cursor) {
         List<Income> incomes = new ArrayList<>();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {

@@ -2,6 +2,7 @@ package ro.birsan.budgetone;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -12,7 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
-import android.widget.Toast;
 
 import java.util.List;
 
@@ -20,12 +20,10 @@ import ro.birsan.budgetone.data.Budget;
 import ro.birsan.budgetone.data.BudgetsDataSource;
 import ro.birsan.budgetone.data.CategoriesDataSource;
 import ro.birsan.budgetone.data.IncomesDataSource;
-import ro.birsan.budgetone.util.IncomeParser;
-import ro.birsan.budgetone.widgets.IIncomeGatherer;
 
 
 public class Dashboard extends AppCompatActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks, SaveCategoryDialogFragment.SaveCategoryDialogListener, IIncomeGatherer.IIncomeGathererListener {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks, SaveCategoryDialogFragment.SaveCategoryDialogListener {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -121,24 +119,8 @@ public class Dashboard extends AppCompatActivity
         }
 
         if (id == R.id.add_income) {
-            if (_currentFragment instanceof IIncomeGatherer)
-            {
-                ((IIncomeGatherer) _currentFragment).showIncomeTextBox();
-            }
-            /*DrawerLayout drawerLayout =  (DrawerLayout)((ViewGroup)getWindow().getDecorView().findViewById(android.R.id.content)).getChildAt(0);
-            View fragmentView = ((FrameLayout)drawerLayout.getChildAt(0)).getChildAt(0);
-            if (fragmentView instanceof RelativeLayout)
-            {
-                ContextualEditText contextualEditText = new ContextualEditText(this, null);
-                contextualEditText.setVisibility(View.INVISIBLE);
-                contextualEditText.setHint("XXXX");
-                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                params.bottomMargin = 50;
-                params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-                ((RelativeLayout) fragmentView).addView(contextualEditText, params);
-                contextualEditText.show();
-            }
-            return true;*/
+            startActivity(new Intent(this, AddIncomeActivity.class));
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -153,27 +135,9 @@ public class Dashboard extends AppCompatActivity
 
     private void ShowRefreshFragment(int position) {
         _currentFragment = PlaceholderFragment.newInstance(position);
-        if (_currentFragment instanceof IIncomeGatherer) {
-            ((IIncomeGatherer) _currentFragment).setOnIncomeAddedListener(this);
-        }
-
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.container, _currentFragment)
                 .commit();
-    }
-
-    @Override
-    public void onAddIncome(String income) {
-        IncomeParser incomeParser = new IncomeParser(income);
-        if (!incomeParser.isValid()) {
-            Toast.makeText(this, R.string.err_invalid_income_input, Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        IncomesDataSource incomesDataSource = new IncomesDataSource(this);
-        incomesDataSource.addIncome(incomeParser.getAmount(), incomeParser.getSource());
-        restoreActionBar();
-        Toast.makeText(this, R.string.add_income_success, Toast.LENGTH_LONG).show();
     }
 
     /**
