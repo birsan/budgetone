@@ -9,24 +9,8 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class MySQLiteHelper extends SQLiteOpenHelper {
 
-    public static final String TABLE_CATEGORIES = "categories";
-    public static final String TABLE_CATEGORIES_COLUMN_ID = "_id";
-    public static final String TABLE_CATEGORIES_COLUMN_NAME = "name";
-    public static final String TABLE_CATEGORIES_COLUMN_PARENT_CATEGORY = "parent";
-    public static final String TABLE_CATEGORIES_COLUMN_MIN_PERCENTAGE = "min_percentage";
-    public static final String TABLE_CATEGORIES_COLUMN_MAX_PERCENTAGE = "max_percentage";
-
-    private static final String TABLE_CATEGORIES_CREATE = "create table "
-            + TABLE_CATEGORIES + "(" + TABLE_CATEGORIES_COLUMN_ID
-            + " integer primary key autoincrement, "
-            + TABLE_CATEGORIES_COLUMN_NAME + " text not null, "
-            + TABLE_CATEGORIES_COLUMN_PARENT_CATEGORY + " integer null, "
-            + TABLE_CATEGORIES_COLUMN_MIN_PERCENTAGE + " integer null, "
-            + TABLE_CATEGORIES_COLUMN_MAX_PERCENTAGE + " integer null "
-            + ");";
-
     private static final String POPULATE_TABLE_CATEGORIES =
-            "INSERT INTO " + TABLE_CATEGORIES + " (" + TABLE_CATEGORIES_COLUMN_ID + "," + TABLE_CATEGORIES_COLUMN_NAME + "," + TABLE_CATEGORIES_COLUMN_PARENT_CATEGORY + "," + TABLE_CATEGORIES_COLUMN_MIN_PERCENTAGE + "," + TABLE_CATEGORIES_COLUMN_MAX_PERCENTAGE + ") VALUES "
+            "INSERT INTO " + Category.TABLE_CATEGORIES + " (" + Category.TABLE_CATEGORIES_COLUMN_ID + "," + Category.TABLE_CATEGORIES_COLUMN_NAME + "," + Category.TABLE_CATEGORIES_COLUMN_PARENT_CATEGORY + "," + Category.TABLE_CATEGORIES_COLUMN_MIN_PERCENTAGE + "," + Category.TABLE_CATEGORIES_COLUMN_MAX_PERCENTAGE + ") VALUES "
                     + "(1, 'Housing', NULL, 25, 35), "
                     + "(2, 'Mortgage/Rent', 1, NULL, NULL), "
                     + "(3, 'Household Repairs', 1, NULL, NULL), "
@@ -92,7 +76,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(TABLE_CATEGORIES_CREATE);
+        db.execSQL(Category.TABLE_CATEGORIES_CREATE);
         db.execSQL(POPULATE_TABLE_CATEGORIES);
         db.execSQL(Budget.TABLE_BUDGETS_CREATE);
         db.execSQL(Income.TABLE_INCOMES_CREATE);

@@ -29,8 +29,6 @@ public class AddIncomeActivity extends ActionBarActivity {
         actionBar.setTitle(R.string.title_activity_add_income);
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeAsUpIndicator(R.drawable.check);
-        actionBar.setDisplayUseLogoEnabled(false);
-        actionBar.setIcon(R.drawable.check);
     }
 
     @Override
@@ -57,7 +55,7 @@ public class AddIncomeActivity extends ActionBarActivity {
                 Toast.makeText(this, "The amount needs to be positive", Toast.LENGTH_LONG).show();
                 return true;
             }
-            
+
             incomesDataSource.addIncome(amount, category);
             incomesDataSource.close();
         }

@@ -3,7 +3,6 @@ package ro.birsan.budgetone.data;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
@@ -17,8 +16,6 @@ public class CategoriesDataSource {
     private SQLiteDatabase readableDatabase;
     private MySQLiteHelper dbHelper;
 
-    private String[] allColumns = { MySQLiteHelper.TABLE_CATEGORIES_COLUMN_ID, MySQLiteHelper.TABLE_CATEGORIES_COLUMN_NAME };
-
     public CategoriesDataSource(Context context) {
         dbHelper = new MySQLiteHelper(context);
         writableDatabase = dbHelper.getWritableDatabase();
@@ -27,9 +24,9 @@ public class CategoriesDataSource {
 
     public Category createCategory(String categoryName) {
         ContentValues values = new ContentValues();
-        values.put(MySQLiteHelper.TABLE_CATEGORIES_COLUMN_NAME, categoryName);
-        long insertId = writableDatabase.insert(MySQLiteHelper.TABLE_CATEGORIES, null, values);
-        Cursor cursor = writableDatabase.query(MySQLiteHelper.TABLE_CATEGORIES, allColumns, MySQLiteHelper.TABLE_CATEGORIES_COLUMN_ID + " = " + insertId, null, null, null, null);
+        values.put(Category.TABLE_CATEGORIES_COLUMN_NAME, categoryName);
+        long insertId = writableDatabase.insert(Category.TABLE_CATEGORIES, null, values);
+        Cursor cursor = writableDatabase.query(Category.TABLE_CATEGORIES, Category.ALL_COLUMNS, Category.TABLE_CATEGORIES_COLUMN_ID + " = " + insertId, null, null, null, null);
         cursor.moveToFirst();
         Category newComment = cursorToComment(cursor);
         cursor.close();
@@ -37,7 +34,7 @@ public class CategoriesDataSource {
     }
 
     public Cursor getCursor(String selection, String[] selectionArgs) {
-        return readableDatabase.query(MySQLiteHelper.TABLE_CATEGORIES, allColumns, selection, selectionArgs, null, null, null);
+        return readableDatabase.query(Category.TABLE_CATEGORIES, Category.ALL_COLUMNS, selection, selectionArgs, null, null, null);
     }
 
     public List<Category> getCategories(String selection, String[] selectionArgs) {

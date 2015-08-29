@@ -6,19 +6,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckedTextView;
-import android.widget.Toast;
 
 import java.util.List;
 
 import ro.birsan.budgetone.R;
-import ro.birsan.budgetone.data.Category;
+import ro.birsan.budgetone.viewmodels.SelectCategoryViewModel;
 
 /**
  * Created by ibirsan on 8/12/2015.
  */
-public class CategoriesSelectionListAdapter extends ArrayAdapter<Category> {
+public class CategoriesSelectionListAdapter extends ArrayAdapter<SelectCategoryViewModel> {
 
-    public CategoriesSelectionListAdapter(Context context, int resource, List<Category> objects) {
+    public CategoriesSelectionListAdapter(Context context, int resource, List<SelectCategoryViewModel> objects) {
         super(context, resource, objects);
     }
 
@@ -31,10 +30,13 @@ public class CategoriesSelectionListAdapter extends ArrayAdapter<Category> {
             item = (CheckedTextView) convertView.findViewById(R.id.text1);
             convertView.setTag(item);
 
+            item.setTag(getItem(position));
             item.setText(getItem(position).getName());
+            item.setFocusable(false);
             item.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     item.toggle();
+                    ((SelectCategoryViewModel)item.getTag()).setSelected(item.isChecked());
                 }
             });
 

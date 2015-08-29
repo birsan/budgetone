@@ -52,11 +52,11 @@ public class CategoryFragment extends Fragment {
     private List<Category> getData()
     {
         CategoriesDataSource categoriesDataSource = new CategoriesDataSource(getActivity());
-        List<Category> categories = categoriesDataSource.getCategories(MySQLiteHelper.TABLE_CATEGORIES_COLUMN_PARENT_CATEGORY + " IS NULL ", null);
+        List<Category> categories = categoriesDataSource.getCategories(Category.TABLE_CATEGORIES_COLUMN_PARENT_CATEGORY + " IS NULL ", null);
         for (int i = 0; i < categories.size(); i++)
         {
             Category category = categories.get(i);
-            List<Category> subcategories = categoriesDataSource.getCategories(MySQLiteHelper.TABLE_CATEGORIES_COLUMN_PARENT_CATEGORY + " == " + category.getId(), null);
+            List<Category> subcategories = categoriesDataSource.getCategories(Category.TABLE_CATEGORIES_COLUMN_PARENT_CATEGORY + " == " + category.getId(), null);
             category.setSubcategories(subcategories);
         }
 
