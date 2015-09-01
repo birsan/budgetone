@@ -1,5 +1,6 @@
 package ro.birsan.budgetone;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SimpleCursorAdapter;
@@ -16,12 +17,29 @@ public class BudgetListFragment extends Fragment {
 
     private SimpleCursorAdapter _adapter;
     private ListView _listView;
-    ImageButton _fabImageButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_budget, container, false);
-        _fabImageButton = (ImageButton) view.findViewById(R.id.fab_image_button);
+        ImageButton btnConfigureBudget = (ImageButton) view.findViewById(R.id.image_money_transfer);
+        ImageButton btnSelectCategories = (ImageButton) view.findViewById(R.id.image_bullets);
+
+        btnConfigureBudget.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DialogAddBudget dialogAddBudget = new DialogAddBudget();
+                dialogAddBudget.show(getActivity().getFragmentManager(), "add_budget");
+            }
+        });
+
+        btnSelectCategories.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), SelectCategoriesActivity.class);
+                startActivity(intent);
+            }
+        });
+
         return view;
     }
 
@@ -37,13 +55,5 @@ public class BudgetListFragment extends Fragment {
         _listView = (ListView)getActivity().findViewById(R.id.list);
         _adapter = new SimpleCursorAdapter(getActivity(), R.layout.budget_list_item, budgetsDataSource.getCurrentMonthBudget(), fromColumns, toViews, 0);
         _listView.setAdapter(_adapter);
-
-        _fabImageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DialogAddBudget dialogAddBudget = new DialogAddBudget();
-                dialogAddBudget.show(getActivity().getFragmentManager(), "add_budget");
-            }
-        });
     }
 }

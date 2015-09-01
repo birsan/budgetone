@@ -32,6 +32,7 @@ public class CategoriesSelectionListAdapter extends ArrayAdapter<SelectCategoryV
 
             item.setTag(getItem(position));
             item.setText(getItem(position).getName());
+            item.setChecked(getItem(position).getSelected());
             item.setFocusable(false);
             item.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
