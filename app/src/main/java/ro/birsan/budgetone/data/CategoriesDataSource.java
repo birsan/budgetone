@@ -49,6 +49,15 @@ public class CategoriesDataSource {
         return comments;
     }
 
+    public Category getCategory(long categoryId)
+    {
+        Cursor cursor = getCursor(Category.TABLE_CATEGORIES_COLUMN_ID + " = ?", new String[]{String.valueOf(categoryId)});
+        cursor.moveToFirst();
+        if (cursor.isAfterLast()) return null;
+
+        return cursorToComment(cursor);
+    }
+
     public void close() {
         dbHelper.close();
     }

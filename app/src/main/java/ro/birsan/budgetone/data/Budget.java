@@ -70,6 +70,10 @@ public class Budget {
         _amount = amount;
     }
 
+    public double getTotalAmount() {
+        return _amount + _rolloverAmount;
+    }
+
     public double get_rolloverAmount() {
         return _rolloverAmount;
     }

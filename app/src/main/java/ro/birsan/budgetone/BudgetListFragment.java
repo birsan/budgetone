@@ -7,15 +7,22 @@ import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import ro.birsan.budgetone.adapters.BudgetArrayAdapter;
 import ro.birsan.budgetone.data.Budget;
 import ro.birsan.budgetone.data.BudgetsDataSource;
+import ro.birsan.budgetone.data.CategoriesDataSource;
+import ro.birsan.budgetone.viewmodels.BudgetViewModel;
 
 public class BudgetListFragment extends Fragment {
 
-    private SimpleCursorAdapter _adapter;
+    private ArrayAdapter<BudgetViewModel> _adapter;
     private ListView _listView;
 
     @Override
@@ -47,13 +54,20 @@ public class BudgetListFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        CategoriesDataSource categoriesDataSource = new CategoriesDataSource(getActivity());
         BudgetsDataSource budgetsDataSource = new BudgetsDataSource(getActivity());
 
-        String[] fromColumns = {Budget.TABLE_BUDGETS_COLUMN_AMOUNT};
-        int[] toViews = {R.id.category_name};
+        List<BudgetViewModel> viewModels = new ArrayList<>();
+        List<Budget> budgets = budgetsDataSource.cursorToList(budgetsDataSource.getCurrentMonthBudget());
+        for(Budget budget: budgets)
+        {
+            double expenses = 0;
+            String categoryName = categoriesDataSource.getCategory(budget.getCategoryId()).getName();
+            viewModels.add(new BudgetViewModel(categoryName, budget.getTotalAmount(), expenses));
+        }
 
         _listView = (ListView)getActivity().findViewById(R.id.list);
-        _adapter = new SimpleCursorAdapter(getActivity(), R.layout.budget_list_item, budgetsDataSource.getCurrentMonthBudget(), fromColumns, toViews, 0);
+        _adapter = new BudgetArrayAdapter(getActivity(), viewModels);
         _listView.setAdapter(_adapter);
     }
 }

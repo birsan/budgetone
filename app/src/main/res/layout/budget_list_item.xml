@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:paddingStart="15dp"
+    android:paddingEnd="15dp"
+    android:paddingTop="15dp"
+    android:paddingBottom="15dp">
 
     <TextView
         android:layout_width="wrap_content"
@@ -8,7 +12,8 @@
         android:text="New Text"
         android:id="@+id/category_name"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentStart="true" />
 
     <ProgressBar
         style="?android:attr/progressBarStyleHorizontal"
@@ -16,5 +21,16 @@
         android:layout_height="wrap_content"
         android:id="@+id/progress"
         android:layout_below="@+id/category_name"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:max="100"
+        android:progress="45" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Text"
+        android:id="@+id/amount_left"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 </RelativeLayout>
