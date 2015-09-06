@@ -17,7 +17,7 @@ public class BudgetsDataSource extends DataSourceBase {
         super(context);
     }
 
-    public List<Budget> cursorToList(Cursor cursor) {
+    public static List<Budget> cursorToList(Cursor cursor) {
         List<Budget> budget = new ArrayList<>();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -90,5 +90,15 @@ public class BudgetsDataSource extends DataSourceBase {
 
     public void close() {
         _dbHelper.close();
+    }
+
+    public void updateBudget(long budgetId, Double amount) {
+        ContentValues values = new ContentValues();
+        values.put(Budget.TABLE_BUDGETS_COLUMN_AMOUNT, amount);
+        _writableDatabase.update(
+                Budget.TABLE_BUDGETS,
+                values,
+                Budget.TABLE_BUDGETS_COLUMN_ID + "= ? ",
+                new String[]{String.valueOf(budgetId)});
     }
 }

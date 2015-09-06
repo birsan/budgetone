@@ -35,10 +35,19 @@
         <activity
             android:name=".AddIncomeActivity"
             android:label="@string/title_activity_add_income"
-            android:parentActivityName=".Dashboard">
+            android:parentActivityName=".Dashboard" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ro.birsan.budgetone.Dashboard" />
+        </activity>
+        <activity
+            android:name=".BudgetConfigurationActivity"
+            android:label="@string/title_activity_budget_configuration"
+            android:parentActivityName=".Dashboard" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ro.birsan.budgetone.Dashboard" />
+
         </activity>
     </application>
 

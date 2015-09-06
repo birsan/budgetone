@@ -34,8 +34,8 @@ public class BudgetListFragment extends Fragment {
         btnConfigureBudget.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DialogAddBudget dialogAddBudget = new DialogAddBudget();
-                dialogAddBudget.show(getActivity().getFragmentManager(), "add_budget");
+                Intent intent = new Intent(getActivity(), BudgetConfigurationActivity.class);
+                startActivity(intent);
             }
         });
 

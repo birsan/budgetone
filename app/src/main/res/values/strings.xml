@@ -31,4 +31,5 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_copy_last_month_budget">CopyLastMonthBudgetActivity</string>
+    <string name="title_activity_budget_configuration">Configure Budget</string>
 </resources>
