@@ -3,6 +3,7 @@ package ro.birsan.budgetone;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -20,10 +21,11 @@ import ro.birsan.budgetone.data.Budget;
 import ro.birsan.budgetone.data.BudgetsDataSource;
 import ro.birsan.budgetone.data.CategoriesDataSource;
 import ro.birsan.budgetone.data.IncomesDataSource;
+import ro.birsan.budgetone.data.TransactionsDataSource;
 
 
 public class Dashboard extends AppCompatActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks, SaveCategoryDialogFragment.SaveCategoryDialogListener {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks, CalculatorFragment.OnFragmentInteractionListener {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -126,10 +128,7 @@ public class Dashboard extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onSaveCategory(int categoryId, String categoryName) {
-        CategoriesDataSource categoriesDataSource = new CategoriesDataSource(this);
-        categoriesDataSource.createCategory(categoryName);
+    private void Refresh() {
         ShowRefreshFragment(mPosition);
     }
 
@@ -138,6 +137,14 @@ public class Dashboard extends AppCompatActivity
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.container, _currentFragment)
                 .commit();
+    }
+
+    @Override
+    public void onTransactionAdded(long categoryId, Double amount) {
+        TransactionsDataSource transactionsDataSource = new TransactionsDataSource(this);
+        transactionsDataSource.addTransaction(categoryId, amount);
+        transactionsDataSource.close();
+        Refresh();
     }
 
     /**

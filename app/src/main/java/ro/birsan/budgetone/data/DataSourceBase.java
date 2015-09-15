@@ -16,4 +16,9 @@ public abstract class DataSourceBase {
         _writableDatabase = _dbHelper.getWritableDatabase();
         _readableDatabase = _dbHelper.getReadableDatabase();
     }
+
+    public void close() {
+        _writableDatabase.close();
+        _readableDatabase.close();
+    }
 }

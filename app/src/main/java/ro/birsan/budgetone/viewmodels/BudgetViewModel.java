@@ -4,15 +4,21 @@ package ro.birsan.budgetone.viewmodels;
  * Created by Irinel on 9/3/2015.
  */
 public class BudgetViewModel {
+    private long _categoryId;
     private String _categoryName;
     private Double _totalAmount;
     private Double _consumedAmount;
 
-    public BudgetViewModel(String categoryName, Double totalAmount, Double consumedAmount)
+    public BudgetViewModel(long categoryId, String categoryName, Double totalAmount, Double consumedAmount)
     {
         _categoryName = categoryName;
         _totalAmount = totalAmount;
         _consumedAmount = consumedAmount;
+        _categoryId = categoryId;
+    }
+
+    public long get_categoryId() {
+        return _categoryId;
     }
 
     public String get_categoryName() {
