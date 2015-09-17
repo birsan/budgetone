@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,12 +20,13 @@ import ro.birsan.budgetone.adapters.BudgetArrayAdapter;
 import ro.birsan.budgetone.data.Budget;
 import ro.birsan.budgetone.data.BudgetsDataSource;
 import ro.birsan.budgetone.data.CategoriesDataSource;
+import ro.birsan.budgetone.data.Category;
 import ro.birsan.budgetone.data.TransactionsDataSource;
+import ro.birsan.budgetone.services.BudgetService;
 import ro.birsan.budgetone.viewmodels.BudgetViewModel;
 
 public class BudgetListFragment extends Fragment{
 
-    private ArrayAdapter<BudgetViewModel> _adapter;
     private ListView _listView;
 
     @Override
@@ -62,17 +62,19 @@ public class BudgetListFragment extends Fragment{
         BudgetsDataSource budgetsDataSource = new BudgetsDataSource(getActivity());
         TransactionsDataSource  transactionsDataSource = new TransactionsDataSource(getActivity());
 
+        BudgetService budgetService = new BudgetService(transactionsDataSource, categoriesDataSource);
+
         List<BudgetViewModel> viewModels = new ArrayList<>();
-        List<Budget> budgets = budgetsDataSource.cursorToList(budgetsDataSource.getCurrentMonthBudget());
+        List<Budget> budgets = BudgetsDataSource.cursorToList(budgetsDataSource.getCurrentMonthBudget());
         for(Budget budget: budgets)
         {
-            double budgetExpenses = transactionsDataSource.getExpensesAmountForCurrentMonth(budget.getCategoryId());
+            double budgetExpenses = budgetService.getTotalExpensesForCurrentMonth(budget.getCategoryId());
             String categoryName = categoriesDataSource.getCategory(budget.getCategoryId()).getName();
             viewModels.add(new BudgetViewModel(budget.getCategoryId(), categoryName, budget.getTotalAmount(), budgetExpenses));
         }
 
         _listView = (ListView)getActivity().findViewById(R.id.list);
-        _adapter = new BudgetArrayAdapter(getActivity(), viewModels);
+        ArrayAdapter<BudgetViewModel> _adapter = new BudgetArrayAdapter(getActivity(), viewModels);
         _listView.setAdapter(_adapter);
         registerForContextMenu(_listView);
     }
@@ -80,23 +82,29 @@ public class BudgetListFragment extends Fragment{
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        MenuInflater inflater = getActivity().getMenuInflater();
-        inflater.inflate(R.menu.budget_contextual_menu, menu);
+
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+        BudgetViewModel budgetViewModel = (BudgetViewModel) _listView.getItemAtPosition(info.position);
+
+        CategoriesDataSource categoriesDataSource = new CategoriesDataSource(getActivity());
+        List<Category> subcategories = categoriesDataSource.getSubcategoriesOf(budgetViewModel.get_categoryId());
+
+        menu.clear();
+        menu.setHeaderTitle("Add transaction to ...");
+        menu.add(0, budgetViewModel.get_categoryId().intValue(), 0, budgetViewModel.get_categoryName() + " (General)");
+        for (Category subcategory : subcategories)
+        {
+            menu.add(0, subcategory.getId().intValue(), 0, subcategory.getName());
+        }
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        switch (item.getItemId()) {
-            case R.id.action_add_transaction:
-                CalculatorFragment calculatorFragment = new CalculatorFragment();
-                Bundle args = new Bundle();
-                args.putLong("category_id", _adapter.getItem(info.position).get_categoryId());
-                calculatorFragment.setArguments(args);
-                calculatorFragment.show(getFragmentManager(), "addTransaction");
-                return true;
-            default:
-                return super.onContextItemSelected(item);
-        }
+        CalculatorFragment calculatorFragment = new CalculatorFragment();
+        Bundle args = new Bundle();
+        args.putLong("category_id", item.getItemId());
+        calculatorFragment.setArguments(args);
+        calculatorFragment.show(getFragmentManager(), "addTransaction");
+        return true;
     }
 }

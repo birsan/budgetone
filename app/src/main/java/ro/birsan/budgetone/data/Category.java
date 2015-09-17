@@ -29,16 +29,25 @@ public class Category {
             + TABLE_CATEGORIES_COLUMN_MAX_PERCENTAGE + " integer null "
             + ");";
 
-    private long id;
+    private Long id;
+    private long _parentId;
     private String name;
     private List<Category> _subcategories;
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public long get_parentId() {
+        return _parentId;
+    }
+
+    public void set_parentId(long _parentId) {
+        this._parentId = _parentId;
     }
 
     public String getName() {

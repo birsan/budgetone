@@ -78,7 +78,7 @@ public class Dashboard extends AppCompatActivity
                 mTitle = getString(R.string.title_section_categories);
                 break;
             case 2:
-                mTitle = getString(R.string.title_section3);
+                mTitle = getString(R.string.title_section_chart);
                 break;
         }
 
@@ -165,27 +165,21 @@ public class Dashboard extends AppCompatActivity
          * number.
          */
         public static Fragment newInstance(int sectionNumber) {
-            if (sectionNumber == 0) {
-                IncomesDataSource incomesDataSource = new IncomesDataSource(_context);
-                if (incomesDataSource.getCurrentAmount() <= 0){
-                    return new NoMonthIncomeFragment();
-                }
-
-                BudgetsDataSource budgetsDataSource = new BudgetsDataSource(_context);
-                List<Budget> budgetItems = budgetsDataSource.cursorToList(budgetsDataSource.getCurrentMonthBudget());
-                if (budgetItems.size() == 0) {
-                    return new NoBudgetFragment();
-                }
-
-                return new BudgetListFragment();
-            }
             if (sectionNumber == 1) return new CategoryFragment();
+            if (sectionNumber == 2) return new ChartFragment();
 
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
+            IncomesDataSource incomesDataSource = new IncomesDataSource(_context);
+            if (incomesDataSource.getCurrentAmount() <= 0) {
+                return new NoMonthIncomeFragment();
+            }
+
+            BudgetsDataSource budgetsDataSource = new BudgetsDataSource(_context);
+            List<Budget> budgetItems = budgetsDataSource.cursorToList(budgetsDataSource.getCurrentMonthBudget());
+            if (budgetItems.size() == 0) {
+                return new NoBudgetFragment();
+            }
+
+            return new BudgetListFragment();
         }
 
         public PlaceholderFragment() {

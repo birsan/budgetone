@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:paddingTop="1dp">
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="50dp"
+        android:id="@+id/pbAmount"
+        android:max="100"
+        android:progress="45"
+        android:progressDrawable="@drawable/chart_progress_bar"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:text="New Text"
+        android:id="@+id/tvCategory"
+        android:layout_gravity="top"
+        android:gravity="center_vertical|center_horizontal"
+        android:paddingRight="10dp"
+        android:textColor="#2c3e50"
+        android:textStyle="bold"
+        android:layout_alignTop="@+id/pbAmount"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="15dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:text="New Text"
+        android:id="@+id/tvAmount"
+        android:layout_alignBottom="@+id/pbAmount"
+        android:layout_alignRight="@+id/pbAmount"
+        android:layout_alignEnd="@+id/pbAmount"
+        android:gravity="center_vertical|center_horizontal"
+        android:layout_marginRight="15dp"
+        android:textColor="#2c3e50" />
+</RelativeLayout>

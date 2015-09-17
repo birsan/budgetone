@@ -56,7 +56,7 @@ public class CategoryFragment extends Fragment {
         for (int i = 0; i < categories.size(); i++)
         {
             Category category = categories.get(i);
-            List<Category> subcategories = categoriesDataSource.getCategories(Category.TABLE_CATEGORIES_COLUMN_PARENT_CATEGORY + " == " + category.getId(), null);
+            List<Category> subcategories = categoriesDataSource.getSubcategoriesOf(category.getId());
             category.setSubcategories(subcategories);
         }
 

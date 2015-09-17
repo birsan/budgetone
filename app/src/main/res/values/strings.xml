@@ -3,9 +3,9 @@
 
     <string name="title_section_dashboard">Dashboard</string>
     <string name="title_section_categories">Categories</string>
+    <string name="title_section_chart">Chart</string>
     <string name="title_activity_select_categories">Select Categories</string>
     <string name="title_activity_add_income">Add Income</string>
-    <string name="title_section3">Section 3</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
