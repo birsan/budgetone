@@ -44,6 +44,30 @@ public class TransactionsDataSource extends DataSourceBase {
         return amount;
     }
 
+    public List<Transaction> getAllTransactionsForCurrentMonth()
+    {
+        Calendar c = Calendar.getInstance();
+        String query = "SELECT * "
+                + " from " + Transaction.TABLE_NAME
+                + " WHERE CAST(strftime('%Y', " + Transaction.COLUMN_CREATED_ON + ") AS decimal) = " + c.get(Calendar.YEAR)
+                + " AND CAST(strftime('%m', " + Transaction.COLUMN_CREATED_ON + ") AS decimal) = " + (c.get(Calendar.MONTH) + 1)
+                + " ORDER BY " + Transaction.COLUMN_CREATED_ON + " DESC;";
+        Cursor cursor = _readableDatabase.rawQuery(query, null);
+        try {
+            return cursorToList(cursor);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
+    public void remove(Long transactionId) {
+        _writableDatabase.delete(
+                Transaction.TABLE_NAME,
+                Transaction.COLUMN_ID + " = ? ",
+                new String[]{transactionId.toString()});
+    }
+
     public static List<Transaction> cursorToList(Cursor cursor) throws ParseException {
         List<Transaction> transactions = new ArrayList<>();
         cursor.moveToFirst();

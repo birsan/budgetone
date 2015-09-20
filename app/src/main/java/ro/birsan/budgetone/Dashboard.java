@@ -25,7 +25,7 @@ import ro.birsan.budgetone.data.TransactionsDataSource;
 
 
 public class Dashboard extends AppCompatActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks, CalculatorFragment.OnFragmentInteractionListener {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks, CalculatorFragment.OnFragmentInteractionListener{
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -75,9 +75,12 @@ public class Dashboard extends AppCompatActivity
                 mTitle = String.valueOf(budgetsDataSource.getCurrentMonthBudgetedAmount()) + "/" + String.valueOf(incomesDataSource.getCurrentAmount());
                 break;
             case 1:
-                mTitle = getString(R.string.title_section_categories);
+                mTitle = getString(R.string.title_section_history);
                 break;
             case 2:
+                mTitle = getString(R.string.title_section_categories);
+                break;
+            case 3:
                 mTitle = getString(R.string.title_section_chart);
                 break;
         }
@@ -165,8 +168,9 @@ public class Dashboard extends AppCompatActivity
          * number.
          */
         public static Fragment newInstance(int sectionNumber) {
-            if (sectionNumber == 1) return new CategoryFragment();
-            if (sectionNumber == 2) return new ChartFragment();
+            if (sectionNumber == 1) return new HistoryFragmentTabHost();
+            if (sectionNumber == 2) return new CategoryFragment();
+            if (sectionNumber == 3) return new ChartFragment();
 
             IncomesDataSource incomesDataSource = new IncomesDataSource(_context);
             if (incomesDataSource.getCurrentAmount() <= 0) {

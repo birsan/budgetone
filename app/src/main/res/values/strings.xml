@@ -4,6 +4,7 @@
     <string name="title_section_dashboard">Dashboard</string>
     <string name="title_section_categories">Categories</string>
     <string name="title_section_chart">Chart</string>
+    <string name="title_section_history">History</string>
     <string name="title_activity_select_categories">Select Categories</string>
     <string name="title_activity_add_income">Add Income</string>
 

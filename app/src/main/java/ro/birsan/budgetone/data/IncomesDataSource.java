@@ -3,10 +3,14 @@ package ro.birsan.budgetone.data;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+
+import ro.birsan.budgetone.util.DateTimeHelper;
 
 /**
  * Created by Irinel on 7/25/2015.
@@ -20,30 +24,28 @@ public class IncomesDataSource extends DataSourceBase {
     public void addIncome(double amount, String source) {
         Calendar c = Calendar.getInstance();
         ContentValues values = new ContentValues();
-        values.put(Income.TABLE_INCOMES_COLUMN_AMOUNT, amount);
-        values.put(Income.TABLE_INCOMES_COLUMN_CATEGORY, source);
-        values.put(Income.TABLE_INCOMES_COLUMN_MONTH, c.get(Calendar.MONTH));
-        values.put(Income.TABLE_INCOMES_COLUMN_YEAR, c.get(Calendar.YEAR));
-        _writableDatabase.insert(Income.TABLE_INCOMES, null, values);
+        values.put(Income.COLUMN_AMOUNT, amount);
+        values.put(Income.COLUMN_CATEGORY, source);
+        values.put(Income.COLUMN_CREATED_ON, DateTimeHelper.ISO8601DateFormat.format(new Date()));
+        _writableDatabase.insert(Income.TABLE_NAME, null, values);
     }
 
     public Cursor getCurrentMonthIncome() {
         Calendar c = Calendar.getInstance();
-        return getIncome(c.get(Calendar.MONTH), c.get(Calendar.YEAR));
+        return getIncome(c.get(Calendar.MONTH) + 1, c.get(Calendar.YEAR));
     }
 
     public Cursor getIncome(int month, int year) {
-        return _readableDatabase.query(
-                Income.TABLE_INCOMES,
-                Income.ALL_COLUMNS,
-                Income.TABLE_INCOMES_COLUMN_MONTH + " == ? AND " + Income.TABLE_INCOMES_COLUMN_YEAR + " == ?",
-                new String[]{Integer.valueOf(month).toString(), Integer.valueOf(year).toString()},
-                null, null, null);
+        String query = "SELECT * FROM " + Income.TABLE_NAME
+                + " WHERE CAST(strftime('%Y', " + Income.COLUMN_CREATED_ON + ") AS decimal) = " + year
+                + " AND CAST(strftime('%m', " + Income.COLUMN_CREATED_ON + ") AS decimal) = " + month
+                + " ORDER BY " + Income.COLUMN_CREATED_ON + " DESC;";
+        return _readableDatabase.rawQuery(query, null);
     }
 
     public List<String> getCategories() {
         List<String> categories = new ArrayList();
-        Cursor cursor = _readableDatabase.rawQuery("SELECT DISTINCT " + Income.TABLE_INCOMES_COLUMN_CATEGORY + " from " + Income.TABLE_INCOMES + ";", null);
+        Cursor cursor = _readableDatabase.rawQuery("SELECT DISTINCT " + Income.COLUMN_CATEGORY + " from " + Income.TABLE_NAME + ";", null);
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             if (!categories.contains(cursor.getString(0))) {
@@ -60,11 +62,18 @@ public class IncomesDataSource extends DataSourceBase {
      */
     public double getCurrentAmount() {
         double allTransactionsValue = 0;
-        Cursor cursor = _readableDatabase.rawQuery("SELECT sum(" + Income.TABLE_INCOMES_COLUMN_AMOUNT + ") from " + Income.TABLE_INCOMES + ";", null);
+        Cursor cursor = _readableDatabase.rawQuery("SELECT sum(" + Income.COLUMN_AMOUNT + ") from " + Income.TABLE_NAME + ";", null);
         cursor.moveToFirst();
         double amount = cursor.getDouble(0) - allTransactionsValue;
         cursor.close();
         return amount;
+    }
+
+    public void remove(Long transactionId) {
+        _writableDatabase.delete(
+                Income.TABLE_NAME,
+                Income.COLUMN_ID + " = ? ",
+                new String[]{transactionId.toString()});
     }
 
     public static List<Income> cursorToList(Cursor cursor) {
