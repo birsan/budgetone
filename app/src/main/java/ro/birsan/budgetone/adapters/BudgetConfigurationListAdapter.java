@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -22,12 +23,24 @@ public class BudgetConfigurationListAdapter extends ArrayAdapter<BudgetConfigura
         TextView name;
         TextView amount;
         SeekBar progress;
-        int position;
+        ImageView plus;
+        ImageView minus;
+
+        public void showButtons(){
+            plus.setVisibility(View.VISIBLE);
+            minus.setVisibility(View.VISIBLE);
+        }
+
+        public void hideButtons(){
+            plus.setVisibility(View.INVISIBLE);
+            minus.setVisibility(View.INVISIBLE);
+        }
     }
 
     private Double _income;
     private List<BudgetConfigurationViewModel> _objects;
     Double _amountLeftForBudget = 0.0;
+    private ViewHolder _currentConfiguredViewHolder = null;
 
     public BudgetConfigurationListAdapter(Context context, List<BudgetConfigurationViewModel> objects, Double income) {
         super(context, 0, objects);
@@ -47,6 +60,8 @@ public class BudgetConfigurationListAdapter extends ArrayAdapter<BudgetConfigura
             viewHolder.name = (TextView) convertView.findViewById(R.id.category_name);
             viewHolder.amount = (TextView) convertView.findViewById(R.id.amount);
             viewHolder.progress = (SeekBar) convertView.findViewById(R.id.seekBar);
+            viewHolder.plus = (ImageView) convertView.findViewById(R.id.btnPlus);
+            viewHolder.minus = (ImageView) convertView.findViewById(R.id.btnMinus);
             convertView.setTag(viewHolder);
         }
         else
@@ -59,6 +74,26 @@ public class BudgetConfigurationListAdapter extends ArrayAdapter<BudgetConfigura
         viewHolder.progress.setMax(_amountLeftForBudget.intValue() + viewModel.get_amount().intValue());
         viewHolder.progress.setProgress(viewModel.get_amount().intValue());
         viewHolder.progress.setEnabled(viewHolder.progress.getMax() > 0);
+        if (_currentConfiguredViewHolder != viewHolder) {
+            viewHolder.hideButtons();
+        }
+        else {
+            viewHolder.plus.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    viewModel.set_amount(viewModel.get_amount() + 1);
+                    refreshSeekBars();
+                }
+            });
+
+            viewHolder.minus.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    viewModel.set_amount(viewModel.get_amount() - 1);
+                    refreshSeekBars();
+                }
+            });
+        }
 
         viewHolder.progress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -66,22 +101,32 @@ public class BudgetConfigurationListAdapter extends ArrayAdapter<BudgetConfigura
                 if (fromUser) {
                     viewModel.set_amount(Double.parseDouble(String.valueOf(progress)));
                     viewHolder.amount.setText(String.valueOf(progress));
+                    if (_currentConfiguredViewHolder != viewHolder) {
+                        if (_currentConfiguredViewHolder != null) {
+                            _currentConfiguredViewHolder.hideButtons();
+                        }
+                        _currentConfiguredViewHolder = viewHolder;
+                        _currentConfiguredViewHolder.showButtons();
+                    }
                 }
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                ComputeAmountLeftForBudget();
-                notifyDataSetChanged();
+                refreshSeekBars();
             }
         });
 
         return convertView;
+    }
+
+    private void refreshSeekBars(){
+        ComputeAmountLeftForBudget();
+        notifyDataSetChanged();
     }
 
     private void ComputeAmountLeftForBudget() {
