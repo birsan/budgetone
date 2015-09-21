@@ -22,6 +22,7 @@ public class BudgetConfigurationListAdapter extends ArrayAdapter<BudgetConfigura
         TextView name;
         TextView amount;
         SeekBar progress;
+        int position;
     }
 
     private Double _income;
@@ -46,28 +47,6 @@ public class BudgetConfigurationListAdapter extends ArrayAdapter<BudgetConfigura
             viewHolder.name = (TextView) convertView.findViewById(R.id.category_name);
             viewHolder.amount = (TextView) convertView.findViewById(R.id.amount);
             viewHolder.progress = (SeekBar) convertView.findViewById(R.id.seekBar);
-
-            viewHolder.progress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    if (fromUser) {
-                        viewModel.set_amount(Double.parseDouble(String.valueOf(progress)));
-                        viewHolder.amount.setText(String.valueOf(progress));
-                    }
-                }
-
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-                    ComputeAmountLeftForBudget();
-                    notifyDataSetChanged();
-                }
-            });
-
             convertView.setTag(viewHolder);
         }
         else
@@ -80,6 +59,27 @@ public class BudgetConfigurationListAdapter extends ArrayAdapter<BudgetConfigura
         viewHolder.progress.setMax(_amountLeftForBudget.intValue() + viewModel.get_amount().intValue());
         viewHolder.progress.setProgress(viewModel.get_amount().intValue());
         viewHolder.progress.setEnabled(viewHolder.progress.getMax() > 0);
+
+        viewHolder.progress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    viewModel.set_amount(Double.parseDouble(String.valueOf(progress)));
+                    viewHolder.amount.setText(String.valueOf(progress));
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                ComputeAmountLeftForBudget();
+                notifyDataSetChanged();
+            }
+        });
 
         return convertView;
     }
