@@ -32,7 +32,7 @@ public class BudgetListFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_budget, container, false);
-        ImageButton btnConfigureBudget = (ImageButton) view.findViewById(R.id.image_money_transfer);
+        ImageButton btnConfigureBudget = (ImageButton) view.findViewById(R.id.image_drag);
         ImageButton btnSelectCategories = (ImageButton) view.findViewById(R.id.image_bullets);
 
         btnConfigureBudget.setOnClickListener(new View.OnClickListener() {

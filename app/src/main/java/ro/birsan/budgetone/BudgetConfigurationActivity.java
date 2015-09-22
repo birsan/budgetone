@@ -19,9 +19,11 @@ import ro.birsan.budgetone.data.IncomesDataSource;
 import ro.birsan.budgetone.viewmodels.BudgetConfigurationViewModel;
 
 
-public class BudgetConfigurationActivity extends ActionBarActivity {
+public class BudgetConfigurationActivity extends ActionBarActivity
+implements BudgetConfigurationListAdapter.AdapterCallbacks {
 
     BudgetConfigurationListAdapter _adapter;
+    private Double _income;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +39,8 @@ public class BudgetConfigurationActivity extends ActionBarActivity {
         {
             objects.add(new BudgetConfigurationViewModel(budget.getId(), budget.getCategoryId(), categoriesDataSource.getCategory(budget.getCategoryId()).getName(), budget.getTotalAmount()));
         }
-        _adapter = new BudgetConfigurationListAdapter(this, objects, incomesDataSource.getCurrentAmount());
+        _income = incomesDataSource.getCurrentAmount();
+        _adapter = new BudgetConfigurationListAdapter(this, objects, _income, this);
 
         final ListView list = (ListView)findViewById(R.id.list);
         list.setAdapter(_adapter);
@@ -63,5 +66,11 @@ public class BudgetConfigurationActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBudgetChaged(Double budgetedAmount) {
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(getString(R.string.title_activity_budget_configuration) + " " + budgetedAmount.toString() + "/" + _income);
     }
 }

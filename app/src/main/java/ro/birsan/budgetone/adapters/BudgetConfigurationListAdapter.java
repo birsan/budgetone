@@ -27,26 +27,38 @@ public class BudgetConfigurationListAdapter extends ArrayAdapter<BudgetConfigura
         ImageView minus;
 
         public void showButtons(){
-            plus.setVisibility(View.VISIBLE);
-            minus.setVisibility(View.VISIBLE);
+            plus.getLayoutParams().width = (int) (16 * scale + 0.5f);
+            minus.getLayoutParams().width = (int) (16 * scale + 0.5f);
+            plus.getLayoutParams().height = (int) (16 * scale + 0.5f);
+            minus.getLayoutParams().height = (int) (16 * scale + 0.5f);
+            plus.requestLayout();
+            minus.requestLayout();
         }
 
         public void hideButtons(){
-            plus.setVisibility(View.INVISIBLE);
-            minus.setVisibility(View.INVISIBLE);
+            plus.getLayoutParams().width = 0;
+            minus.getLayoutParams().width = 0;
+            plus.getLayoutParams().height = 0;
+            minus.getLayoutParams().height = 0;
+            plus.requestLayout();
+            minus.requestLayout();
         }
     }
 
+    static float scale;
     private Double _income;
     private List<BudgetConfigurationViewModel> _objects;
     Double _amountLeftForBudget = 0.0;
     private ViewHolder _currentConfiguredViewHolder = null;
+    private AdapterCallbacks _adapterCallbacks;
 
-    public BudgetConfigurationListAdapter(Context context, List<BudgetConfigurationViewModel> objects, Double income) {
+    public BudgetConfigurationListAdapter(Context context, List<BudgetConfigurationViewModel> objects, Double income, AdapterCallbacks adapterCallbacks) {
         super(context, 0, objects);
         _income = income;
         _objects = objects;
         ComputeAmountLeftForBudget();
+        scale = getContext().getResources().getDisplayMetrics().density;
+        _adapterCallbacks = adapterCallbacks;
     }
 
     @Override
@@ -127,6 +139,7 @@ public class BudgetConfigurationListAdapter extends ArrayAdapter<BudgetConfigura
     private void refreshSeekBars(){
         ComputeAmountLeftForBudget();
         notifyDataSetChanged();
+        _adapterCallbacks.onBudgetChaged(_income - _amountLeftForBudget);
     }
 
     private void ComputeAmountLeftForBudget() {
@@ -136,5 +149,10 @@ public class BudgetConfigurationListAdapter extends ArrayAdapter<BudgetConfigura
             _amountLeftForBudget += object.get_amount();
         }
         _amountLeftForBudget = _income - _amountLeftForBudget;
+    }
+
+    public interface AdapterCallbacks
+    {
+        void onBudgetChaged(Double budgetedAmount);
     }
 }

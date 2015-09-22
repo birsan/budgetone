@@ -13,7 +13,7 @@
         android:transcriptMode="alwaysScroll"/>
 
     <ImageButton
-        android:id="@+id/image_money_transfer"
+        android:id="@+id/image_drag"
         android:layout_width="@dimen/fab_button_diameter"
         android:layout_height="@dimen/fab_button_diameter"
         android:layout_alignParentEnd="true"
@@ -21,7 +21,7 @@
         android:layout_marginBottom="@dimen/fab_button_margin_bottom"
         android:layout_marginRight="@dimen/fab_button_margin_right"
         android:background="@drawable/oval_ripple"
-        android:src="@drawable/money_transfer"
+        android:src="@drawable/drag"
         android:tint="@android:color/white"
         android:elevation="@dimen/elevation_low"
         android:stateListAnimator="@anim/button_elevation"/>
@@ -30,12 +30,12 @@
         android:id="@+id/image_bullets"
         android:layout_width="@dimen/fab_button_diameter"
         android:layout_height="@dimen/fab_button_diameter"
-        android:layout_toLeftOf="@id/image_money_transfer"
+        android:layout_toLeftOf="@id/image_drag"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="@dimen/fab_button_margin_bottom"
         android:layout_marginRight="@dimen/fab_button_margin_right"
         android:background="@drawable/oval_ripple"
-        android:src="@drawable/bullets"
+        android:src="@drawable/double_check"
         android:tint="@android:color/white"
         android:elevation="@dimen/elevation_low"
         android:stateListAnimator="@anim/button_elevation"/>
