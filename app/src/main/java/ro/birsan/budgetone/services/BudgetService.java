@@ -1,7 +1,10 @@
 package ro.birsan.budgetone.services;
 
+import java.util.Calendar;
 import java.util.List;
 
+import ro.birsan.budgetone.data.Budget;
+import ro.birsan.budgetone.data.BudgetsDataSource;
 import ro.birsan.budgetone.data.CategoriesDataSource;
 import ro.birsan.budgetone.data.Category;
 import ro.birsan.budgetone.data.TransactionsDataSource;
@@ -12,10 +15,15 @@ import ro.birsan.budgetone.data.TransactionsDataSource;
 public class BudgetService {
     TransactionsDataSource _transactionsDataSource;
     CategoriesDataSource _categoriesDataSource;
+    BudgetsDataSource _budgetsDataSource;
 
-    public BudgetService(TransactionsDataSource transactionsDataSource, CategoriesDataSource categoriesDataSource){
+    public BudgetService(
+            TransactionsDataSource transactionsDataSource,
+            CategoriesDataSource categoriesDataSource,
+            BudgetsDataSource budgetsDataSource){
         _transactionsDataSource = transactionsDataSource;
         _categoriesDataSource = categoriesDataSource;
+        _budgetsDataSource = budgetsDataSource;
     }
 
     public Double getTotalExpensesForCurrentMonth(Long categoryId) {
@@ -25,5 +33,12 @@ public class BudgetService {
             budgetExpenses += _transactionsDataSource.getExpensesAmountForCurrentMonth(subcategory.getId());
         }
         return budgetExpenses;
+    }
+
+    public Double getLastMonthBudget(Long categoryId)
+    {
+        Calendar c = Calendar.getInstance();
+        Budget budget = _budgetsDataSource.getMonthBudget(categoryId, c.get(Calendar.YEAR), c.get(Calendar.MONTH) - 1);
+        return budget != null ? budget.get_amount() : 0.0;
     }
 }

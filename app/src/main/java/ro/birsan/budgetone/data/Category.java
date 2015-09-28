@@ -33,6 +33,24 @@ public class Category {
     private long _parentId;
     private String name;
     private List<Category> _subcategories;
+    private Integer _minPercentage;
+    private Integer _maxPercentage;
+
+    public Integer get_minPercentage() {
+        return _minPercentage != null ? _minPercentage : 0;
+    }
+
+    public void set_minPercentage(Integer _minPercentage) {
+        this._minPercentage = _minPercentage;
+    }
+
+    public Integer get_maxPercentage() {
+        return _maxPercentage != null ? _maxPercentage : 0;
+    }
+
+    public void set_maxPercentage(Integer _maxPercentage) {
+        this._maxPercentage = _maxPercentage;
+    }
 
     public Long getId() {
         return id;

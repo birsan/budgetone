@@ -9,7 +9,10 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import ro.birsan.budgetone.util.DateTimeHelper;
 
@@ -21,12 +24,37 @@ public class TransactionsDataSource extends DataSourceBase {
         super(context);
     }
 
-    public void addTransaction(long categoryId, double amount) {
+    public void addTransactionForCategory(long categoryId, double amount) {
         ContentValues values = new ContentValues();
         values.put(Transaction.COLUMN_CATEGORY_ID, categoryId);
         values.put(Transaction.COLUMN_AMOUNT, amount);
         values.put(Transaction.COLUMN_CREATED_ON, DateTimeHelper.ISO8601DateFormat.format(new Date()));
         _writableDatabase.insert(Transaction.TABLE_NAME, null, values);
+    }
+
+    public void addTransactionForGoal(UUID goalId, double amount) {
+        ContentValues values = new ContentValues();
+        values.put(Transaction.COLUMN_GOAL_ID, goalId.toString());
+        values.put(Transaction.COLUMN_AMOUNT, amount);
+        values.put(Transaction.COLUMN_CREATED_ON, DateTimeHelper.ISO8601DateFormat.format(new Date()));
+        _writableDatabase.insert(Transaction.TABLE_NAME, null, values);
+    }
+
+    public double getGoalTransactionsAmount(UUID goalId) {
+        String query = "SELECT sum(" + Transaction.COLUMN_AMOUNT + ") from " + Transaction.TABLE_NAME
+                + " WHERE "
+                + Transaction.COLUMN_GOAL_ID + " = " + goalId.toString()
+                + ";";
+        Cursor cursor = _readableDatabase.rawQuery(query, null);
+        cursor.moveToFirst();
+        double amount = 0.0;
+        if (!cursor.isAfterLast())
+        {
+            amount = cursor.getDouble(0);
+        }
+
+        cursor.close();
+        return amount;
     }
 
     public double getExpensesAmountForCurrentMonth(long categoryId) {
@@ -77,5 +105,35 @@ public class TransactionsDataSource extends DataSourceBase {
         }
         cursor.close();
         return transactions;
+    }
+
+    public Map<String, Double> getExpensesAmountPerMonth(Long categoryId, Integer toMonth, Integer toYear) {
+        Map<String, Double> expensesPerMonth = new HashMap<>();
+        String query = "SELECT sum(" + Transaction.COLUMN_AMOUNT + "), strftime('%Ym', " + Transaction.COLUMN_CREATED_ON + ")"
+                + " FROM " + Transaction.TABLE_NAME
+                + " WHERE " + Transaction.COLUMN_CATEGORY_ID + " = " + categoryId
+                + " AND strftime('%Ym', " + Transaction.COLUMN_CREATED_ON + ") = " + toYear.toString() + toMonth.toString()
+                + " GROUP BY strftime('%Ym', " + Transaction.COLUMN_CREATED_ON + ")";
+        Cursor cursor = _readableDatabase.rawQuery(query, null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            expensesPerMonth.put(cursor.getString(1), cursor.getDouble(0));
+            cursor.moveToNext();
+        }
+        return expensesPerMonth;
+    }
+
+    public Double getTransactionsAmount() {
+        String query = "SELECT sum(" + Transaction.COLUMN_AMOUNT + ") from " + Transaction.TABLE_NAME + ";";
+        Cursor cursor = _readableDatabase.rawQuery(query, null);
+        cursor.moveToFirst();
+        double amount = 0.0;
+        if (!cursor.isAfterLast())
+        {
+            amount = cursor.getDouble(0);
+        }
+
+        cursor.close();
+        return amount;
     }
 }

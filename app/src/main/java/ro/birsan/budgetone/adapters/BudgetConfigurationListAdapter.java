@@ -1,6 +1,7 @@
 package ro.birsan.budgetone.adapters;
 
 import android.content.Context;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,26 +23,49 @@ public class BudgetConfigurationListAdapter extends ArrayAdapter<BudgetConfigura
     private static class ViewHolder {
         TextView name;
         TextView amount;
+        TextView tvSuggestedMin;
+        TextView tvSuggestedMax;
+        TextView tvExpensesAverage;
+        TextView tvLastMonth;
+        TextView tvLastMonthLabel;
+        TextView tvMonthAverageLabel;
+        TextView tvAdviceLabel;
+        TextView tvTo;
         SeekBar progress;
         ImageView plus;
         ImageView minus;
 
         public void showButtons(){
-            plus.getLayoutParams().width = (int) (16 * scale + 0.5f);
-            minus.getLayoutParams().width = (int) (16 * scale + 0.5f);
-            plus.getLayoutParams().height = (int) (16 * scale + 0.5f);
-            minus.getLayoutParams().height = (int) (16 * scale + 0.5f);
-            plus.requestLayout();
-            minus.requestLayout();
+            setVisibility(View.VISIBLE);
         }
 
         public void hideButtons(){
-            plus.getLayoutParams().width = 0;
-            minus.getLayoutParams().width = 0;
-            plus.getLayoutParams().height = 0;
-            minus.getLayoutParams().height = 0;
+            setVisibility(View.GONE);
+        }
+
+        private void setVisibility(int visibility) {
+            plus.setVisibility(visibility);
+            minus.setVisibility(visibility);
+            tvSuggestedMin.setVisibility(visibility);
+            tvSuggestedMax.setVisibility(visibility);
+            tvExpensesAverage.setVisibility(visibility);
+            tvLastMonth.setVisibility(visibility);
+            tvLastMonthLabel.setVisibility(visibility);
+            tvMonthAverageLabel.setVisibility(visibility);
+            tvAdviceLabel.setVisibility(visibility);
+            tvTo.setVisibility(visibility);
+
+
             plus.requestLayout();
             minus.requestLayout();
+            tvSuggestedMin.requestLayout();
+            tvSuggestedMax.requestLayout();
+            tvExpensesAverage.requestLayout();
+            tvLastMonth.requestLayout();
+            tvLastMonthLabel.requestLayout();
+            tvMonthAverageLabel.requestLayout();
+            tvAdviceLabel.requestLayout();
+            tvTo.requestLayout();
         }
     }
 
@@ -71,6 +95,14 @@ public class BudgetConfigurationListAdapter extends ArrayAdapter<BudgetConfigura
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.budget_configuration_item, parent, false);
             viewHolder.name = (TextView) convertView.findViewById(R.id.category_name);
             viewHolder.amount = (TextView) convertView.findViewById(R.id.amount);
+            viewHolder.tvSuggestedMin = (TextView) convertView.findViewById(R.id.tvSuggestedMin);
+            viewHolder.tvSuggestedMax = (TextView) convertView.findViewById(R.id.tvSuggestedMax);
+            viewHolder.tvExpensesAverage = (TextView) convertView.findViewById(R.id.tvExpensesAverage);
+            viewHolder.tvLastMonth = (TextView) convertView.findViewById(R.id.tvLastMonth);
+            viewHolder.tvAdviceLabel = (TextView) convertView.findViewById(R.id.tvAdviceLabel);
+            viewHolder.tvMonthAverageLabel = (TextView) convertView.findViewById(R.id.tvMonthAverageLabel);
+            viewHolder.tvLastMonthLabel = (TextView) convertView.findViewById(R.id.tvLastMonthLabel);
+            viewHolder.tvTo = (TextView) convertView.findViewById(R.id.tvTo);
             viewHolder.progress = (SeekBar) convertView.findViewById(R.id.seekBar);
             viewHolder.plus = (ImageView) convertView.findViewById(R.id.btnPlus);
             viewHolder.minus = (ImageView) convertView.findViewById(R.id.btnMinus);
@@ -83,6 +115,14 @@ public class BudgetConfigurationListAdapter extends ArrayAdapter<BudgetConfigura
 
         viewHolder.name.setText(viewModel.get_categoryName());
         viewHolder.amount.setText(String.valueOf(viewModel.get_amount().intValue()));
+        String tvSuggestedMinText = "<u>" + viewModel.get_suggestedMinAmount().toString() + "</u>";
+        String tvSuggestedMaxText = "<u>" + viewModel.get_suggestedMaxAmount().toString() + "</u>";
+        String expensesAverageText = "<u>" + viewModel.get_monthAverage().toString() + "</u>";
+        String lastMonthText = "<u>" + viewModel.get_lastMonthBudgetedAmount().toString() + "</u>";
+        viewHolder.tvSuggestedMin.setText(Html.fromHtml(tvSuggestedMinText));
+        viewHolder.tvSuggestedMax.setText(Html.fromHtml(tvSuggestedMaxText));
+        viewHolder.tvExpensesAverage.setText(Html.fromHtml(expensesAverageText));
+        viewHolder.tvLastMonth.setText(Html.fromHtml(lastMonthText));
         viewHolder.progress.setMax(_amountLeftForBudget.intValue() + viewModel.get_amount().intValue());
         viewHolder.progress.setProgress(viewModel.get_amount().intValue());
         viewHolder.progress.setEnabled(viewHolder.progress.getMax() > 0);
@@ -90,19 +130,51 @@ public class BudgetConfigurationListAdapter extends ArrayAdapter<BudgetConfigura
             viewHolder.hideButtons();
         }
         else {
+            viewHolder.tvLastMonth.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        setAmount(viewModel, Double.valueOf(viewModel.get_lastMonthBudgetedAmount()));
+                    } catch (NumberFormatException e) {
+                    }
+                }
+            });
+
+            viewHolder.tvExpensesAverage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        setAmount(viewModel, Double.valueOf(viewModel.get_monthAverage()));
+                    } catch (NumberFormatException e) {
+                    }
+                }
+            });
+
+            viewHolder.tvSuggestedMin.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    setAmount(viewModel, viewModel.get_suggestedMinAmount());
+                }
+            });
+
+            viewHolder.tvSuggestedMax.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    setAmount(viewModel, viewModel.get_suggestedMaxAmount());
+                }
+            });
+
             viewHolder.plus.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    viewModel.set_amount(viewModel.get_amount() + 1);
-                    refreshSeekBars();
+                    setAmount(viewModel, viewModel.get_amount() + 1);
                 }
             });
 
             viewHolder.minus.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    viewModel.set_amount(viewModel.get_amount() - 1);
-                    refreshSeekBars();
+                    setAmount(viewModel, viewModel.get_amount() - 1);
                 }
             });
         }
@@ -134,6 +206,11 @@ public class BudgetConfigurationListAdapter extends ArrayAdapter<BudgetConfigura
         });
 
         return convertView;
+    }
+
+    private void setAmount(BudgetConfigurationViewModel viewModel, Double amount) {
+        viewModel.set_amount(Math.max(0, Math.min(amount, _amountLeftForBudget.intValue() + viewModel.get_amount().intValue())));
+        refreshSeekBars();
     }
 
     private void refreshSeekBars(){

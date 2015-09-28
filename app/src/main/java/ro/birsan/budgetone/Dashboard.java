@@ -3,7 +3,6 @@ package ro.birsan.budgetone;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
@@ -16,16 +15,19 @@ import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 
 import java.util.List;
+import java.util.UUID;
 
 import ro.birsan.budgetone.data.Budget;
 import ro.birsan.budgetone.data.BudgetsDataSource;
-import ro.birsan.budgetone.data.CategoriesDataSource;
+import ro.birsan.budgetone.data.GoalsDataSource;
 import ro.birsan.budgetone.data.IncomesDataSource;
 import ro.birsan.budgetone.data.TransactionsDataSource;
+import ro.birsan.budgetone.services.BalanceService;
+import ro.birsan.budgetone.services.GoalsService;
 
 
 public class Dashboard extends AppCompatActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks, CalculatorFragment.OnFragmentInteractionListener{
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks, CalculatorFragment.OnFragmentInteractionListener, GoalFragment.OnFragmentInteractionListener{
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -40,6 +42,18 @@ public class Dashboard extends AppCompatActivity
     private int mPosition;
 
     private Fragment _currentFragment;
+
+    IncomesDataSource _incomesDataSource;
+    TransactionsDataSource _transactionsDataSource;
+    BudgetsDataSource _budgetsDataSource;
+    BalanceService _balanceService;
+
+    public Dashboard() {
+        _incomesDataSource = new IncomesDataSource(this);
+        _transactionsDataSource = new TransactionsDataSource(this);
+        _budgetsDataSource = new BudgetsDataSource(this);
+        _balanceService = new BalanceService(_incomesDataSource, _transactionsDataSource);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,9 +84,7 @@ public class Dashboard extends AppCompatActivity
 
         switch (mPosition) {
             case 0:
-                IncomesDataSource incomesDataSource = new IncomesDataSource(this);
-                BudgetsDataSource budgetsDataSource = new BudgetsDataSource(this);
-                mTitle = String.valueOf(budgetsDataSource.getCurrentMonthBudgetedAmount()) + "/" + String.valueOf(incomesDataSource.getCurrentAmount());
+                mTitle = String.valueOf(_budgetsDataSource.getCurrentMonthBudgetedAmount()) + "/" + String.valueOf(_balanceService.getAvailableAmount());
                 break;
             case 1:
                 mTitle = getString(R.string.title_section_history);
@@ -82,6 +94,9 @@ public class Dashboard extends AppCompatActivity
                 break;
             case 3:
                 mTitle = getString(R.string.title_section_chart);
+                break;
+            case 4:
+                mTitle = getString(R.string.title_section_goals);
                 break;
         }
 
@@ -102,6 +117,9 @@ public class Dashboard extends AppCompatActivity
             switch (mPosition) {
                 case 0:
                     getMenuInflater().inflate(R.menu.dashboard, menu);
+                    break;
+                case 4:
+                    getMenuInflater().inflate(R.menu.goals, menu);
                     break;
             }
 
@@ -128,6 +146,11 @@ public class Dashboard extends AppCompatActivity
             return true;
         }
 
+        if (id == R.id.add_target) {
+            startActivity(new Intent(this, AddTargetActivity.class));
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -145,9 +168,16 @@ public class Dashboard extends AppCompatActivity
     @Override
     public void onTransactionAdded(long categoryId, Double amount) {
         TransactionsDataSource transactionsDataSource = new TransactionsDataSource(this);
-        transactionsDataSource.addTransaction(categoryId, amount);
+        transactionsDataSource.addTransactionForCategory(categoryId, amount);
         transactionsDataSource.close();
         Refresh();
+    }
+
+    @Override
+    public void onGoalAmountSubmitted(GoalFragment goalFragment, String goalId, Double amount) {
+        GoalsService goalsService = new GoalsService(new GoalsDataSource(this), new TransactionsDataSource(this));
+        Double newAmount = goalsService.addAmount(UUID.fromString(goalId), amount);
+        goalFragment.setProgress(newAmount);
     }
 
     /**
@@ -171,9 +201,12 @@ public class Dashboard extends AppCompatActivity
             if (sectionNumber == 1) return new HistoryFragmentTabHost();
             if (sectionNumber == 2) return new CategoryFragment();
             if (sectionNumber == 3) return new ChartFragment();
+            if (sectionNumber == 4) return new GoalsFragment();
 
             IncomesDataSource incomesDataSource = new IncomesDataSource(_context);
-            if (incomesDataSource.getCurrentAmount() <= 0) {
+            TransactionsDataSource transactionsDataSource = new TransactionsDataSource(_context);
+            BalanceService balanceService = new BalanceService(incomesDataSource, transactionsDataSource);
+            if (balanceService.getAvailableAmount() <= 0) {
                 return new NoMonthIncomeFragment();
             }
 

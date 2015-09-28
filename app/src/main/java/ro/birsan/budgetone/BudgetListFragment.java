@@ -62,7 +62,7 @@ public class BudgetListFragment extends Fragment{
         BudgetsDataSource budgetsDataSource = new BudgetsDataSource(getActivity());
         TransactionsDataSource  transactionsDataSource = new TransactionsDataSource(getActivity());
 
-        BudgetService budgetService = new BudgetService(transactionsDataSource, categoriesDataSource);
+        BudgetService budgetService = new BudgetService(transactionsDataSource, categoriesDataSource, budgetsDataSource);
 
         List<BudgetViewModel> viewModels = new ArrayList<>();
         List<Budget> budgets = BudgetsDataSource.cursorToList(budgetsDataSource.getCurrentMonthBudget());
@@ -104,7 +104,7 @@ public class BudgetListFragment extends Fragment{
         Bundle args = new Bundle();
         args.putLong("category_id", item.getItemId());
         calculatorFragment.setArguments(args);
-        calculatorFragment.show(getFragmentManager(), "addTransaction");
+        calculatorFragment.show(getFragmentManager(), "addTransactionForCategory");
         return true;
     }
 }

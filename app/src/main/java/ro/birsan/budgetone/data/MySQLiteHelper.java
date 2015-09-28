@@ -81,6 +81,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         db.execSQL(Budget.TABLE_BUDGETS_CREATE);
         db.execSQL(Income.TABLE_INCOMES_CREATE);
         db.execSQL(Transaction.TABLE_CREATE);
+        db.execSQL(GoalsDataSource.TABLE_CREATE);
     }
 
     @Override

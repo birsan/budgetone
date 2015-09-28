@@ -9,7 +9,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Text"
+        android:text="tvCategoryName"
         android:id="@+id/category_name"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
@@ -18,7 +18,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Text"
+        android:text="tvAmount"
         android:id="@+id/amount"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
@@ -40,16 +40,100 @@
         android:src="@drawable/plus"
         android:contentDescription="Plus"
         android:layout_below="@+id/seekBar"
-        android:layout_alignRight="@+id/amount"
-        android:layout_alignEnd="@+id/amount" />
+        android:layout_alignRight="@+id/seekBar"
+        android:layout_alignEnd="@+id/seekBar"
+        android:layout_marginTop="10dp" />
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/btnMinus"
         android:src="@drawable/minus"
+        android:layout_alignLeft="@+id/btnPlus"
+        android:layout_below="@+id/btnPlus"
+        android:layout_marginTop="15dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="tvSuggestedMin"
+        android:id="@+id/tvSuggestedMin"
+        android:layout_alignBaseline="@+id/tvAdviceLabel"
+        android:layout_alignLeft="@+id/tvLastMonth"
+        android:clickable="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="tvLastMonth"
+        android:id="@+id/tvLastMonth"
+        android:clickable="true"
+        android:layout_toRightOf="@+id/tvLastMonthLabel"
+        android:layout_alignBaseline="@+id/tvLastMonthLabel"
+        android:layout_marginLeft="8dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="tvExpensesAverage"
+        android:id="@+id/tvExpensesAverage"
+        android:layout_alignBaseline="@+id/tvMonthAverageLabel"
+        android:layout_alignLeft="@+id/tvLastMonth"
+        android:clickable="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Last month budget:"
+        android:id="@+id/tvLastMonthLabel"
         android:layout_below="@+id/seekBar"
-        android:layout_toLeftOf="@+id/btnPlus"
-        android:layout_toStartOf="@+id/btnPlus"
-        android:layout_marginRight="15dp" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Month average:"
+        android:id="@+id/tvMonthAverageLabel"
+        android:layout_below="@+id/tvLastMonthLabel"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_alignRight="@+id/tvLastMonthLabel"
+        android:gravity="right" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Our advice:"
+        android:id="@+id/tvAdviceLabel"
+        android:layout_below="@+id/tvMonthAverageLabel"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_alignRight="@+id/tvLastMonthLabel"
+        android:gravity="right" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="to"
+        android:id="@+id/tvTo"
+        android:layout_toRightOf="@+id/tvSuggestedMin"
+        android:layout_alignBaseline="@+id/tvSuggestedMin"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="tvSuggestedMax"
+        android:id="@+id/tvSuggestedMax"
+        android:clickable="true"
+        android:layout_toRightOf="@+id/tvTo"
+        android:layout_alignBaseline="@+id/tvTo" />
+
 </RelativeLayout>

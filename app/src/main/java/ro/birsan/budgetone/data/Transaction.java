@@ -4,6 +4,7 @@ import android.database.Cursor;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.UUID;
 
 import ro.birsan.budgetone.util.DateTimeHelper;
 
@@ -14,6 +15,7 @@ public class Transaction {
     public static final String TABLE_NAME = "transactions";
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_CATEGORY_ID = "category_id";
+    public static final String COLUMN_GOAL_ID = "goal_id";
     public static final String COLUMN_CREATED_ON = "created_on";
     public static final String COLUMN_AMOUNT = "amount";
     public static final String[] ALL_COLUMNS = {
@@ -27,11 +29,13 @@ public class Transaction {
             + TABLE_NAME + "("
             + COLUMN_ID + " integer primary key autoincrement, "
             + COLUMN_CATEGORY_ID + " integer null, "
+            + COLUMN_GOAL_ID + " text null, "
             + COLUMN_CREATED_ON + " text null, " //ISO8601 string format
             + COLUMN_AMOUNT + " real null"
             + ");";
 
     private long _categoryId;
+    private UUID _goalId;
     private Date _createdOn;
     private Double _amount;
     private long _id;
@@ -50,6 +54,14 @@ public class Transaction {
 
     public void set_categoryId(long _categoryId) {
         this._categoryId = _categoryId;
+    }
+
+    public UUID get_goalId() {
+        return _goalId;
+    }
+
+    public void set_goalId(UUID _goalId) {
+        this._goalId = _goalId;
     }
 
     public Date get_createdOn() {
@@ -72,8 +84,9 @@ public class Transaction {
         Transaction transaction = new Transaction();
         transaction.set_id(cursor.getLong(0));
         transaction.set_categoryId(cursor.getLong(1));
-        transaction.set_createdOn(DateTimeHelper.ISO8601DateFormat.parse(cursor.getString(2)));
-        transaction.set_amount(cursor.getDouble(3));
+        transaction.set_goalId(UUID.fromString(cursor.getString(2)));
+        transaction.set_createdOn(DateTimeHelper.ISO8601DateFormat.parse(cursor.getString(3)));
+        transaction.set_amount(cursor.getDouble(4));
         return transaction;
     }
 }

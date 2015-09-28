@@ -62,6 +62,8 @@ public class CategoriesDataSource extends DataSourceBase {
         category.setId(cursor.getLong(0));
         category.setName(cursor.getString(1));
         category.set_parentId(cursor.getLong(2));
+        category.set_minPercentage(cursor.getInt(3));
+        category.set_maxPercentage(cursor.getInt(4));
         return category;
     }
 }

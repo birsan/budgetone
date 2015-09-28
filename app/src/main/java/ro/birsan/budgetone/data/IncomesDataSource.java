@@ -57,14 +57,10 @@ public class IncomesDataSource extends DataSourceBase {
         return categories;
     }
 
-    /**
-     * @return current available amount computed as sum of all incomes minus sum of all transactions.
-     */
-    public double getCurrentAmount() {
-        double allTransactionsValue = 0;
+    public double getIncomeAmount() {
         Cursor cursor = _readableDatabase.rawQuery("SELECT sum(" + Income.COLUMN_AMOUNT + ") from " + Income.TABLE_NAME + ";", null);
         cursor.moveToFirst();
-        double amount = cursor.getDouble(0) - allTransactionsValue;
+        double amount = cursor.getDouble(0);
         cursor.close();
         return amount;
     }

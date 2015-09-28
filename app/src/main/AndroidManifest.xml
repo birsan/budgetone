@@ -47,7 +47,15 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ro.birsan.budgetone.Dashboard" />
-
+        </activity>
+        <activity
+            android:name=".AddTargetActivity"
+            android:label="@string/title_activity_add_target"
+            android:parentActivityName=".Dashboard" >
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ro.birsan.budgetone.Dashboard" />>
         </activity>
     </application>
 
