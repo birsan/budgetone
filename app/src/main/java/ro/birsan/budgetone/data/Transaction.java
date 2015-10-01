@@ -34,7 +34,7 @@ public class Transaction {
             + COLUMN_AMOUNT + " real null"
             + ");";
 
-    private long _categoryId;
+    private Long _categoryId = null;
     private UUID _goalId;
     private Date _createdOn;
     private Double _amount;
@@ -48,7 +48,7 @@ public class Transaction {
         this._id = _id;
     }
 
-    public long get_categoryId() {
+    public Long get_categoryId() {
         return _categoryId;
     }
 
@@ -80,12 +80,25 @@ public class Transaction {
         this._amount = _amount;
     }
 
-    public static final Transaction cursorToTransaction(Cursor cursor) throws ParseException {
+    public static final Transaction cursorToTransaction(Cursor cursor) {
         Transaction transaction = new Transaction();
         transaction.set_id(cursor.getLong(0));
-        transaction.set_categoryId(cursor.getLong(1));
-        transaction.set_goalId(UUID.fromString(cursor.getString(2)));
-        transaction.set_createdOn(DateTimeHelper.ISO8601DateFormat.parse(cursor.getString(3)));
+        if (!cursor.isNull(1))
+        {
+            transaction.set_categoryId(cursor.getLong(1));
+        }
+
+        if (!cursor.isNull(2)) {
+            transaction.set_goalId(UUID.fromString(cursor.getString(2)));
+        }
+
+        try{
+            Date createdOn = DateTimeHelper.ISO8601DateFormat.parse(cursor.getString(3));
+            transaction.set_createdOn(createdOn);
+        }
+        catch(ParseException e)
+        {}
+
         transaction.set_amount(cursor.getDouble(4));
         return transaction;
     }

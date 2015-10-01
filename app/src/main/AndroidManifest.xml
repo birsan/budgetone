@@ -49,7 +49,7 @@
                 android:value="ro.birsan.budgetone.Dashboard" />
         </activity>
         <activity
-            android:name=".AddTargetActivity"
+            android:name=".AddGoalActivity"
             android:label="@string/title_activity_add_target"
             android:parentActivityName=".Dashboard" >
             <!-- Parent activity meta-data to support 4.0 and lower -->

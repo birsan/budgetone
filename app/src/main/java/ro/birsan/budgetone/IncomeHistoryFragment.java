@@ -37,7 +37,7 @@ public class IncomeHistoryFragment extends Fragment {
 
         final IncomesDataSource incomesDataSource = new IncomesDataSource(getActivity());
         List<HistoryViewModel> viewModels = new ArrayList<>();
-        List<Income> transactions = IncomesDataSource.cursorToList(incomesDataSource.getCurrentMonthIncome());
+        List<Income> transactions = incomesDataSource.getCurrentMonthIncome();
         for (Income transaction : transactions) {
             viewModels.add(new HistoryViewModel(transaction.get_id(), transaction.get_category(), transaction.get_createdOn(), transaction.get_amount()));
         }

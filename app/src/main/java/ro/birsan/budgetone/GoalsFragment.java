@@ -3,7 +3,7 @@ package ro.birsan.budgetone;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +20,7 @@ import ro.birsan.budgetone.services.GoalsService;
  */
 public class GoalsFragment extends Fragment {
     ViewPager _viewPager;
-    FragmentPagerAdapter _tabsAdapter;
+    FragmentStatePagerAdapter _tabsAdapter;
     //private final GoalsService goalsService = new GoalsService(new GoalsDataSource(getActivity()));
 
     public GoalsFragment() {
@@ -35,18 +35,16 @@ public class GoalsFragment extends Fragment {
         final GoalsService goalsService = new GoalsService(new GoalsDataSource(getActivity()), transactionsDataSource);
 
         _viewPager = (ViewPager) view.findViewById(R.id.pager);
-        _tabsAdapter = new FragmentPagerAdapter(getFragmentManager()) {
+        _tabsAdapter = new FragmentStatePagerAdapter(getFragmentManager()) {
             @Override
             public android.support.v4.app.Fragment getItem(int position) {
                 GoalWithProgress goal = goalsService.getInProgressGoals().get(position);
                 String dueDate = goal.get_dueDate() != null ? goal.get_dueDate().toString() : "No due date";
-                String progressDescription = goal.get_progress() + " out of " + goal.get_targetAmount();
                 Bundle args = GoalFragment.buildArguments(
                         goal.get_id().toString(),
                         goal.get_name(),
                         goal.get_description(),
                         dueDate,
-                        progressDescription,
                         goal.get_targetAmount(),
                         goal.get_progress(),
                         goal.get_image());

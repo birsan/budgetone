@@ -16,8 +16,10 @@ import java.util.List;
 
 import ro.birsan.budgetone.adapters.HistoryAdapter;
 import ro.birsan.budgetone.data.CategoriesDataSource;
+import ro.birsan.budgetone.data.GoalsDataSource;
 import ro.birsan.budgetone.data.Transaction;
 import ro.birsan.budgetone.data.TransactionsDataSource;
+import ro.birsan.budgetone.services.GoalsService;
 import ro.birsan.budgetone.viewmodels.HistoryViewModel;
 
 
@@ -37,11 +39,22 @@ public class ExpensesHistoryFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_history, container, false);
 
         final TransactionsDataSource transactionsDataSource = new TransactionsDataSource(getActivity());
+        GoalsDataSource goalsDataSource = new GoalsDataSource(getActivity());
         List<HistoryViewModel> viewModels = new ArrayList<>();
         CategoriesDataSource categoriesDataSource = new CategoriesDataSource(getActivity());
+        GoalsService goalsService = new GoalsService(goalsDataSource, transactionsDataSource);
         List<Transaction> allTransactions = transactionsDataSource.getAllTransactionsForCurrentMonth();
         for (Transaction transaction : allTransactions) {
-            String title = categoriesDataSource.getCategory(transaction.get_categoryId()).getName();
+            String title = "";
+            if (transaction.get_categoryId() != null)
+            {
+                title = categoriesDataSource.getCategory(transaction.get_categoryId()).getName();
+            }
+            else if (transaction.get_goalId() != null)
+            {
+                title = goalsService.getGoal(transaction.get_goalId()).get_name();
+            }
+
             viewModels.add(new HistoryViewModel(transaction.get_id(), title, transaction.get_createdOn(), transaction.get_amount()));
         }
 

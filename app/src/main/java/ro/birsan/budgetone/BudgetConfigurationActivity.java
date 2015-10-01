@@ -26,7 +26,7 @@ public class BudgetConfigurationActivity extends ActionBarActivity
 implements BudgetConfigurationListAdapter.AdapterCallbacks {
 
     BudgetConfigurationListAdapter _adapter;
-    private Double _income;
+    private Double _availableAmount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +43,8 @@ implements BudgetConfigurationListAdapter.AdapterCallbacks {
         BudgetService budgetService = new BudgetService(transactionsDataSource, categoriesDataSource, budgetsDataSource);
         ArrayList<BudgetConfigurationViewModel> objects = new ArrayList<>();
         List<Budget> budgets = BudgetsDataSource.cursorToList(budgetsDataSource.getCurrentMonthBudget());
-        _income = balanceService.getAvailableAmount();
+        _availableAmount = balanceService.getAvailableAmount();
+        Double monthIncome = balanceService.getCurrentMonthIncome();
         for(Budget budget: budgets)
         {
             Category category = categoriesDataSource.getCategory(budget.getCategoryId());
@@ -54,12 +55,12 @@ implements BudgetConfigurationListAdapter.AdapterCallbacks {
                     budget.getCategoryId(),
                     category.getName(),
                     budget.getTotalAmount(),
-                    (category.get_minPercentage() * _income / 100),
-                    (category.get_maxPercentage() * _income / 100),
+                    (category.get_minPercentage() * monthIncome / 100),
+                    (category.get_maxPercentage() * monthIncome / 100),
                     monthAverage > 0 ? monthAverage.toString() : "N/A",
                     lastMonthBudget > 0 ? lastMonthBudget.toString() : "N/A"));
         }
-        _adapter = new BudgetConfigurationListAdapter(this, objects, _income, this);
+        _adapter = new BudgetConfigurationListAdapter(this, objects, _availableAmount, this);
 
         final ListView list = (ListView)findViewById(R.id.list);
         list.setAdapter(_adapter);
@@ -90,6 +91,6 @@ implements BudgetConfigurationListAdapter.AdapterCallbacks {
     @Override
     public void onBudgetChaged(Double budgetedAmount) {
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(getString(R.string.title_activity_budget_configuration) + " " + budgetedAmount.toString() + "/" + _income);
+        actionBar.setTitle(getString(R.string.title_activity_budget_configuration) + " " + budgetedAmount.toString() + "/" + _availableAmount);
     }
 }

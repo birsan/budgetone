@@ -2,10 +2,12 @@ package ro.birsan.budgetone;
 
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +17,10 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.UUID;
+
+import ro.birsan.budgetone.viewmodels.HistoryViewModel;
 
 
 /**
@@ -26,7 +32,6 @@ public class GoalFragment extends Fragment  implements View.OnClickListener {
     public static final String BUNDLE_NAME_KEY = "name";
     public static final String BUNDLE_DESCRIPTION_KEY = "description";
     public static final String BUNDLE_DUE_DATE_KEY = "duedate";
-    public static final String BUNDLE_PROGRESS_DESC_KEY = "progress_desc";
     public static final String BUNDLE_TARGET_KEY = "target";
     public static final String BUNDLE_PROGRESS_KEY = "progress";
     public static final String BUNDLE_IMAGE_KEY = "image";
@@ -34,8 +39,10 @@ public class GoalFragment extends Fragment  implements View.OnClickListener {
     private OnFragmentInteractionListener _listener;
 
     ProgressBar _progressBar;
+    TextView tvProgress;
     EditText _etAmount;
     Double _target;
+    Double _progress;
     String _goalId;
 
     public GoalFragment() {
@@ -47,7 +54,6 @@ public class GoalFragment extends Fragment  implements View.OnClickListener {
             String name,
             String description,
             String dueDate,
-            String progressDescription,
             Double target,
             Double progress,
             byte[] image)
@@ -57,7 +63,6 @@ public class GoalFragment extends Fragment  implements View.OnClickListener {
         args.putString(GoalFragment.BUNDLE_NAME_KEY, name);
         args.putString(GoalFragment.BUNDLE_IMAGE_KEY, description);
         args.putString(GoalFragment.BUNDLE_DUE_DATE_KEY, dueDate);
-        args.putString(GoalFragment.BUNDLE_PROGRESS_DESC_KEY, progressDescription);
         args.putDouble(GoalFragment.BUNDLE_TARGET_KEY, target);
         args.putDouble(GoalFragment.BUNDLE_PROGRESS_KEY, progress);
         args.putByteArray(BUNDLE_IMAGE_KEY, image);
@@ -76,7 +81,9 @@ public class GoalFragment extends Fragment  implements View.OnClickListener {
     }
 
     public void setProgress(Double progress) {
+        tvProgress.setText(getProgressDescription(progress, _target));
         _progressBar.setProgress(((Double) ((progress * 100) / _target)).intValue());
+        getArguments().putDouble(BUNDLE_PROGRESS_KEY, progress);
     }
 
     @Override
@@ -86,35 +93,52 @@ public class GoalFragment extends Fragment  implements View.OnClickListener {
         String name = getArguments().getString(BUNDLE_NAME_KEY);
         String description = getArguments().getString(BUNDLE_DESCRIPTION_KEY);
         String dueDate = getArguments().getString(BUNDLE_DUE_DATE_KEY);
-        String progressDescription = getArguments().getString(BUNDLE_PROGRESS_DESC_KEY);
         _target = getArguments().getDouble(BUNDLE_TARGET_KEY);
-        Double progress = getArguments().getDouble(BUNDLE_PROGRESS_KEY);
+        _progress = getArguments().getDouble(BUNDLE_PROGRESS_KEY);
         byte[] imageTile = getArguments().getByteArray(BUNDLE_IMAGE_KEY);
         Bitmap bMap = BitmapFactory.decodeByteArray(imageTile, 0, imageTile.length);
         View view = inflater.inflate(R.layout.fragment_goal, container, false);
         TextView tvName = (TextView) view.findViewById(R.id.tvName);
         TextView tvDescription = (TextView) view.findViewById(R.id.tvDescription);
         TextView tvDueDate = (TextView) view.findViewById(R.id.tvDueDate);
-        TextView tvProgress = (TextView) view.findViewById(R.id.tvProgress);
+        tvProgress = (TextView) view.findViewById(R.id.tvProgress);
         _progressBar = (ProgressBar) view.findViewById(R.id.progress);
         Button btnSubmitMoney = (Button) view.findViewById(R.id.btnSubmitMoney);
+        Button btnRemove = (Button) view.findViewById(R.id.btnRemove);
         _etAmount = (EditText) view.findViewById(R.id.etAmount);
         ImageView image = (ImageView) view.findViewById(R.id.image);
         tvName.setText(name);
         tvDescription.setText(description);
         tvDueDate.setText(dueDate);
-        tvProgress.setText(progressDescription);
+        tvProgress.setText(getProgressDescription(_progress, _target));
         _progressBar.setMax(100);
-        _progressBar.setProgress(((Double) ((progress * 100) / _target)).intValue());
+        _progressBar.setProgress(((Double) ((_progress * 100) / _target)).intValue());
         image.setImageBitmap(bMap);
 
         btnSubmitMoney.setOnClickListener(this);
+        btnRemove.setOnClickListener(this);
 
         return view;
     }
 
     @Override
     public void onClick(View v) {
+        if (v.getId() == R.id.btnRemove)
+        {
+            new AlertDialog.Builder(getActivity())
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle("Removing goal")
+                    .setMessage("Are you sure you want to remove this goal?")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            _listener.onGoalRemoved(UUID.fromString(_goalId));
+                        }
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+        }
+
         if (v.getId() == R.id.btnSubmitMoney)
         {
             Double amountToSubmit = 0.0;
@@ -132,8 +156,14 @@ public class GoalFragment extends Fragment  implements View.OnClickListener {
         }
     }
 
+    private String getProgressDescription(Double progress, Double target)
+    {
+        return progress + " out of " + target;
+    }
+
     public interface OnFragmentInteractionListener
     {
         void onGoalAmountSubmitted(GoalFragment goalFragment, String goalId, Double amount);
+        void onGoalRemoved(UUID goalId);
     }
 }

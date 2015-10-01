@@ -3,9 +3,7 @@ package ro.birsan.budgetone.data;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.util.Log;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -40,21 +38,14 @@ public class TransactionsDataSource extends DataSourceBase {
         _writableDatabase.insert(Transaction.TABLE_NAME, null, values);
     }
 
-    public double getGoalTransactionsAmount(UUID goalId) {
-        String query = "SELECT sum(" + Transaction.COLUMN_AMOUNT + ") from " + Transaction.TABLE_NAME
+    public List<Transaction> getTransactionsByGoal(UUID goalId)
+    {
+        String query = "SELECT * from " + Transaction.TABLE_NAME
                 + " WHERE "
-                + Transaction.COLUMN_GOAL_ID + " = " + goalId.toString()
+                + Transaction.COLUMN_GOAL_ID + " = '" + goalId.toString() + "'"
                 + ";";
         Cursor cursor = _readableDatabase.rawQuery(query, null);
-        cursor.moveToFirst();
-        double amount = 0.0;
-        if (!cursor.isAfterLast())
-        {
-            amount = cursor.getDouble(0);
-        }
-
-        cursor.close();
-        return amount;
+        return cursorToList(cursor);
     }
 
     public double getExpensesAmountForCurrentMonth(long categoryId) {
@@ -72,8 +63,7 @@ public class TransactionsDataSource extends DataSourceBase {
         return amount;
     }
 
-    public List<Transaction> getAllTransactionsForCurrentMonth()
-    {
+    public List<Transaction> getAllTransactionsForCurrentMonth() {
         Calendar c = Calendar.getInstance();
         String query = "SELECT * "
                 + " from " + Transaction.TABLE_NAME
@@ -81,12 +71,7 @@ public class TransactionsDataSource extends DataSourceBase {
                 + " AND CAST(strftime('%m', " + Transaction.COLUMN_CREATED_ON + ") AS decimal) = " + (c.get(Calendar.MONTH) + 1)
                 + " ORDER BY " + Transaction.COLUMN_CREATED_ON + " DESC;";
         Cursor cursor = _readableDatabase.rawQuery(query, null);
-        try {
-            return cursorToList(cursor);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return new ArrayList<>();
-        }
+        return cursorToList(cursor);
     }
 
     public void remove(Long transactionId) {
@@ -96,7 +81,7 @@ public class TransactionsDataSource extends DataSourceBase {
                 new String[]{transactionId.toString()});
     }
 
-    public static List<Transaction> cursorToList(Cursor cursor) throws ParseException {
+    public static List<Transaction> cursorToList(Cursor cursor) {
         List<Transaction> transactions = new ArrayList<>();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {

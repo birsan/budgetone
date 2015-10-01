@@ -3,7 +3,6 @@ package ro.birsan.budgetone.data;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -30,17 +29,17 @@ public class IncomesDataSource extends DataSourceBase {
         _writableDatabase.insert(Income.TABLE_NAME, null, values);
     }
 
-    public Cursor getCurrentMonthIncome() {
+    public List<Income> getCurrentMonthIncome() {
         Calendar c = Calendar.getInstance();
         return getIncome(c.get(Calendar.MONTH) + 1, c.get(Calendar.YEAR));
     }
 
-    public Cursor getIncome(int month, int year) {
+    public List<Income> getIncome(int month, int year) {
         String query = "SELECT * FROM " + Income.TABLE_NAME
                 + " WHERE CAST(strftime('%Y', " + Income.COLUMN_CREATED_ON + ") AS decimal) = " + year
                 + " AND CAST(strftime('%m', " + Income.COLUMN_CREATED_ON + ") AS decimal) = " + month
                 + " ORDER BY " + Income.COLUMN_CREATED_ON + " DESC;";
-        return _readableDatabase.rawQuery(query, null);
+        return cursorToList(_readableDatabase.rawQuery(query, null));
     }
 
     public List<String> getCategories() {

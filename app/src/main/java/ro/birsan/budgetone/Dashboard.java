@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.UUID;
 
@@ -48,18 +49,16 @@ public class Dashboard extends AppCompatActivity
     BudgetsDataSource _budgetsDataSource;
     BalanceService _balanceService;
 
-    public Dashboard() {
-        _incomesDataSource = new IncomesDataSource(this);
-        _transactionsDataSource = new TransactionsDataSource(this);
-        _budgetsDataSource = new BudgetsDataSource(this);
-        _balanceService = new BalanceService(_incomesDataSource, _transactionsDataSource);
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         PlaceholderFragment._context = this;
         setContentView(R.layout.activity_dashboard);
+
+        _incomesDataSource = new IncomesDataSource(this);
+        _transactionsDataSource = new TransactionsDataSource(this);
+        _budgetsDataSource = new BudgetsDataSource(this);
+        _balanceService = new BalanceService(_incomesDataSource, _transactionsDataSource);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
@@ -84,7 +83,9 @@ public class Dashboard extends AppCompatActivity
 
         switch (mPosition) {
             case 0:
-                mTitle = String.valueOf(_budgetsDataSource.getCurrentMonthBudgetedAmount()) + "/" + String.valueOf(_balanceService.getAvailableAmount());
+                DecimalFormat decimalFormat = new DecimalFormat();
+                decimalFormat.setDecimalSeparatorAlwaysShown(false);
+                mTitle = "To spend: " + decimalFormat.format(_balanceService.getAvailableAmount());
                 break;
             case 1:
                 mTitle = getString(R.string.title_section_history);
@@ -147,7 +148,7 @@ public class Dashboard extends AppCompatActivity
         }
 
         if (id == R.id.add_target) {
-            startActivity(new Intent(this, AddTargetActivity.class));
+            startActivity(new Intent(this, AddGoalActivity.class));
             return true;
         }
 
@@ -178,6 +179,13 @@ public class Dashboard extends AppCompatActivity
         GoalsService goalsService = new GoalsService(new GoalsDataSource(this), new TransactionsDataSource(this));
         Double newAmount = goalsService.addAmount(UUID.fromString(goalId), amount);
         goalFragment.setProgress(newAmount);
+    }
+
+    @Override
+    public void onGoalRemoved(UUID goalId) {
+        GoalsService goalsService = new GoalsService(new GoalsDataSource(this), new TransactionsDataSource(this));
+        goalsService.removeGoal(goalId);
+        Refresh();
     }
 
     /**

@@ -58,7 +58,7 @@ public class GoalsDataSource extends DataSourceBase {
 
     public Goal getGoal(UUID goalId) {
         Goal goal = null;
-        Cursor cursor = _readableDatabase.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_ID + " = " + goalId.toString() + ";", null);
+        Cursor cursor = _readableDatabase.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_ID + " = '" + goalId.toString() + "';", null);
         cursor.moveToFirst();
         if (!cursor.isAfterLast())
             goal = cursorToGoal(cursor);
@@ -93,13 +93,13 @@ public class GoalsDataSource extends DataSourceBase {
         Date dueDate = null;
         Date createdOn = null;
         try {
-            String dueDateString = cursor.getString(6);
+            String dueDateString = cursor.getString(5);
             if (dueDateString != null)
             {
                 dueDate = DateTimeHelper.ISO8601DateFormat.parse(dueDateString);
             }
 
-            createdOn = DateTimeHelper.ISO8601DateFormat.parse(cursor.getString(7));
+            createdOn = DateTimeHelper.ISO8601DateFormat.parse(cursor.getString(6));
         } catch (ParseException e) {
             e.printStackTrace();
         }

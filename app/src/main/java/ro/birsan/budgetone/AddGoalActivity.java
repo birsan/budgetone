@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -26,7 +27,7 @@ import ro.birsan.budgetone.services.GoalsService;
 import ro.birsan.budgetone.util.DateTimeHelper;
 
 
-public class AddTargetActivity extends ActionBarActivity {
+public class AddGoalActivity extends ActionBarActivity {
     private static final int REQUEST_CODE = 1;
 
     private ImageView _image;
@@ -81,9 +82,17 @@ public class AddTargetActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         if (id == android.R.id.home) {
-            GoalsService goalsService = new GoalsService(new GoalsDataSource(this), new TransactionsDataSource(this));
             String name = ((EditText)findViewById(R.id.etName)).getText().toString();
             String description = ((EditText)findViewById(R.id.etDescription)).getText().toString();
+            Double targetAmount = 0.0;
+            try
+            {
+                targetAmount = Double.valueOf(((EditText) findViewById(R.id.etTargetAmount)).getText().toString());
+            }
+            catch (NumberFormatException e){}
+            if (!validateInput(name, targetAmount)) return true;
+
+            GoalsService goalsService = new GoalsService(new GoalsDataSource(this), new TransactionsDataSource(this));
 
             _image.setDrawingCacheEnabled(true);
             _image.buildDrawingCache();
@@ -92,7 +101,6 @@ public class AddTargetActivity extends ActionBarActivity {
             bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
             byte[] image = stream.toByteArray();
 
-            Double targetAmount = Double.valueOf(((EditText) findViewById(R.id.etTargetAmount)).getText().toString());
             Date dueDate = null;
             try {
                 dueDate = DateTimeHelper.ISO8601DateFormat.parse(((EditText) findViewById(R.id.etDueDate)).getText().toString());
@@ -100,9 +108,25 @@ public class AddTargetActivity extends ActionBarActivity {
                 e.printStackTrace();
             }
             goalsService.createGoal(name, description, image, targetAmount, dueDate);
-            return true;
+            goalsService.close();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private Boolean validateInput(String name, Double target)
+    {
+        if (name == null || name.isEmpty()) {
+            Toast.makeText(this, "A goal needs a name!", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        if (target <= 0)
+        {
+            Toast.makeText(this, "A goal with target zero is already accomplished!", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        return true;
     }
 }

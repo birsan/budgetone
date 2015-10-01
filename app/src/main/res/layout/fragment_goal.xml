@@ -6,7 +6,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|top">
 
         <ImageView
@@ -67,7 +67,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Submit money"
+            android:text="Add Money"
             android:id="@+id/btnSubmitMoney"
             android:focusableInTouchMode="false"
             android:layout_alignBottom="@+id/etAmount"
@@ -87,5 +87,15 @@
             android:layout_toStartOf="@+id/btnSubmitMoney"
             android:layout_marginTop="15dp" />
 
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Remove goal"
+            android:id="@+id/btnRemove"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@+id/btnSubmitMoney" />
+
     </RelativeLayout>
+
 </FrameLayout>
