@@ -14,6 +14,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import ro.birsan.budgetone.adapters.BudgetArrayAdapter;
@@ -65,7 +66,7 @@ public class BudgetListFragment extends Fragment{
         BudgetService budgetService = new BudgetService(transactionsDataSource, categoriesDataSource, budgetsDataSource);
 
         List<BudgetViewModel> viewModels = new ArrayList<>();
-        List<Budget> budgets = BudgetsDataSource.cursorToList(budgetsDataSource.getCurrentMonthBudget());
+        List<Budget> budgets = budgetService.getMonthBudget(new Date());
         for(Budget budget: budgets)
         {
             double budgetExpenses = budgetService.getTotalExpensesForCurrentMonth(budget.getCategoryId());

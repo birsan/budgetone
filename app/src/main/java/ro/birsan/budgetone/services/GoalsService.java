@@ -10,6 +10,7 @@ import ro.birsan.budgetone.data.Goal;
 import ro.birsan.budgetone.data.GoalsDataSource;
 import ro.birsan.budgetone.data.Transaction;
 import ro.birsan.budgetone.data.TransactionsDataSource;
+import ro.birsan.budgetone.util.DateTimeHelper;
 
 /**
  * Created by Irinel on 9/26/2015.
@@ -31,37 +32,49 @@ public class GoalsService implements Closeable {
         _goalGoalDataSource.createGoal(goal);
     }
 
-    public GoalWithProgress getGoal(UUID goalId)
+    public GoalExt getGoal(UUID goalId)
     {
         Goal goal = _goalGoalDataSource.getGoal(goalId);
-        return new GoalWithProgress(goal, getGoalTransactionsAmount(goal.get_id()));
+        return new GoalExt(goal, getGoalTransactionsAmount(goal.get_id()), 0.0);
     }
 
-    public List<GoalWithProgress> getInProgressGoals()
+    public List<GoalExt> getInProgressGoals()
     {
-        List<GoalWithProgress> inProgressGoals = new ArrayList<>();
+        List<GoalExt> inProgressGoals = new ArrayList<>();
         List<Goal> goals = _goalGoalDataSource.getAllGoals();
         for(Goal goal : goals)
         {
-            GoalWithProgress goalWithProgress = new GoalWithProgress(goal, getGoalTransactionsAmount(goal.get_id()));
-            if (!goalWithProgress.getIsDone())
+            Double transactionsAmount = getGoalTransactionsAmount(goal.get_id());
+            Double advice = 0.0;
+            if (goal.get_dueDate() != null) {
+                Double currentMonthTransactionAmount = getTransactionAmountForMonth(goal.get_id(), new Date());
+                int monthsLeft = Math.abs(DateTimeHelper.monthsBetween(goal.get_dueDate(), new Date()));
+                Double amountBeforeThisMonth = transactionsAmount - currentMonthTransactionAmount;
+                Double minAmountPerMonth = (goal.get_targetAmount() - amountBeforeThisMonth) / monthsLeft;
+                if (minAmountPerMonth > currentMonthTransactionAmount) {
+                    advice = Math.ceil(minAmountPerMonth - currentMonthTransactionAmount);
+                }
+            }
+
+            GoalExt goalExt = new GoalExt(goal, transactionsAmount, advice);
+            if (!goalExt.getIsDone())
             {
-                inProgressGoals.add(goalWithProgress);
+                inProgressGoals.add(goalExt);
             }
         }
         return inProgressGoals;
     }
 
-    public List<GoalWithProgress> getAccomplishedGoals()
+    public List<GoalExt> getAccomplishedGoals()
     {
-        List<GoalWithProgress> accomplishedGoals = new ArrayList<>();
+        List<GoalExt> accomplishedGoals = new ArrayList<>();
         List<Goal> goals = _goalGoalDataSource.getAllGoals();
         for(Goal goal : goals)
         {
-            GoalWithProgress goalWithProgress = new GoalWithProgress(goal, getGoalTransactionsAmount(goal.get_id()));
-            if (!goalWithProgress.getIsDone())
+            GoalExt goalExt = new GoalExt(goal, getGoalTransactionsAmount(goal.get_id()), 0.0);
+            if (goalExt.getIsDone())
             {
-                accomplishedGoals.add(goalWithProgress);
+                accomplishedGoals.add(goalExt);
             }
         }
         return accomplishedGoals;
@@ -86,6 +99,20 @@ public class GoalsService implements Closeable {
     public void close() {
         _transactionsDataSource.close();
         _goalGoalDataSource.close();
+    }
+
+    private Double getTransactionAmountForMonth(UUID goalId, Date date)
+    {
+        Double amount = 0.0;
+        List<Transaction> transactions =  _transactionsDataSource.getTransactionsByGoal(goalId);
+        for(Transaction transaction : transactions)
+        {
+            if (DateTimeHelper.monthsBetween(transaction.get_createdOn(), date) == 0)
+            {
+                amount += transaction.get_amount();
+            }
+        }
+        return amount;
     }
 
     private Double getGoalTransactionsAmount(UUID goalId)

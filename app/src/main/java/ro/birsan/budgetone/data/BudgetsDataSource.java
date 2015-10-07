@@ -6,6 +6,7 @@ import android.database.Cursor;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -30,26 +31,26 @@ public class BudgetsDataSource extends DataSourceBase {
 
     public ArrayList GetMonthSelectedCategories(int year, int month) {
         ArrayList<Long> selectedCategories = new ArrayList<>();
-        List<Budget> budgetItems = cursorToList(getCurrentMonthBudget());
+        List<Budget> budgetItems = getCurrentMonthBudget();
         for (Budget budgetItem : budgetItems) {
             selectedCategories.add(budgetItem.getCategoryId());
         }
         return selectedCategories;
     }
 
-    public Cursor getCurrentMonthBudget() {
+    public List<Budget> getCurrentMonthBudget() {
         Calendar c = Calendar.getInstance();
         return getMonthBudget(c.get(Calendar.YEAR), c.get(Calendar.MONTH));
     }
 
-    public Cursor getMonthBudget(int year, int month)
+    public List<Budget> getMonthBudget(int year, int month)
     {
-        return _readableDatabase.query(
+        return cursorToList(_readableDatabase.query(
                 Budget.TABLE_BUDGETS,
                 Budget.ALL_COLUMNS,
                 Budget.TABLE_BUDGETS_COLUMN_MONTH + " == ? AND " + Budget.TABLE_BUDGETS_COLUMN_YEAR + " == ?",
                 new String[]{String.valueOf(month), String.valueOf(year)},
-                null, null, null);
+                null, null, null));
     }
 
     public Budget getMonthBudget(Long categoryId, int year, int month)
@@ -107,13 +108,15 @@ public class BudgetsDataSource extends DataSourceBase {
         _dbHelper.close();
     }
 
-    public void updateBudget(long budgetId, Double amount) {
+    public void updateBudget(Long categoryId, Date month, Double amount) {
+        Calendar c = Calendar.getInstance();
         ContentValues values = new ContentValues();
         values.put(Budget.TABLE_BUDGETS_COLUMN_AMOUNT, amount);
+        c.setTime(month);
         _writableDatabase.update(
                 Budget.TABLE_BUDGETS,
                 values,
-                Budget.TABLE_BUDGETS_COLUMN_ID + "= ? ",
-                new String[]{String.valueOf(budgetId)});
+                Budget.TABLE_BUDGETS_COLUMN_YEAR + " = ? AND " + Budget.TABLE_BUDGETS_COLUMN_MONTH + " = ? AND " + Budget.TABLE_BUDGETS_COLUMN_CATEGORY_ID + " = ?",
+                new String[]{String.valueOf(c.get(Calendar.YEAR)), String.valueOf(c.get(Calendar.MONTH)), categoryId.toString()});
     }
 }

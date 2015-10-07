@@ -1,10 +1,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" tools:context="ro.birsan.budgetone.GoalFragment"
-    android:orientation="vertical">
+    android:orientation="horizontal">
     <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="0.4">
         <ImageView
             android:layout_width="match_parent"
@@ -16,12 +16,13 @@
             android:scaleType="centerCrop"
             android:adjustViewBounds="true"
             android:maxHeight="100dp" />
-        </RelativeLayout>
+    </RelativeLayout>
     <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="0.6"
-        android:layout_gravity="center_horizontal|top">
+        android:layout_gravity="center_horizontal|top"
+        android:layout_marginTop="15dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -89,19 +90,6 @@
             android:layout_marginBottom="8dp"
             android:textColor="#d35400" />
 
-        <ImageButton
-            android:id="@+id/btnRemove"
-            android:layout_width="@dimen/fab_button_diameter"
-            android:layout_height="@dimen/fab_button_diameter"
-            android:background="@drawable/fab_shape"
-            android:src="@drawable/recycle_bin"
-            android:tint="@android:color/white"
-            android:layout_alignParentBottom="true"
-            android:layout_marginRight="@dimen/fab_button_margin_right"
-            android:layout_marginBottom="@dimen/fab_button_margin_bottom"
-            android:contentDescription="@string/remove_goal"
-            android:layout_alignParentRight="true" />
-
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
@@ -133,6 +121,19 @@
                 android:layout_weight=".5"
                 android:background="#c0392b" />
         </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btnRemove"
+            android:layout_width="@dimen/fab_button_diameter"
+            android:layout_height="@dimen/fab_button_diameter"
+            android:background="@drawable/fab_shape"
+            android:src="@drawable/recycle_bin"
+            android:tint="@android:color/white"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="@dimen/fab_button_margin_right"
+            android:layout_marginBottom="@dimen/fab_button_margin_bottom"
+            android:contentDescription="@string/remove_goal"
+            android:layout_alignParentRight="true" />
 
     </RelativeLayout>
 

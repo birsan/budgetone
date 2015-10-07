@@ -1,6 +1,8 @@
 package ro.birsan.budgetone;
 
 import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,8 +10,11 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -19,12 +24,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import ro.birsan.budgetone.data.GoalsDataSource;
 import ro.birsan.budgetone.data.TransactionsDataSource;
 import ro.birsan.budgetone.services.GoalsService;
-import ro.birsan.budgetone.util.DateTimeHelper;
 
 
 public class AddGoalActivity extends ActionBarActivity {
@@ -36,6 +42,36 @@ public class AddGoalActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_target);
+
+        final EditText etDueDate = (EditText)findViewById(R.id.etDueDate);
+        etDueDate.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() != MotionEvent.ACTION_UP) return true;
+
+                View focusedView = getCurrentFocus();
+                if (focusedView != null) {
+                    InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(focusedView.getWindowToken(), 0);
+                }
+
+                etDueDate.requestFocus();
+                Calendar cal = Calendar.getInstance();
+                new DatePickerDialog(
+                        AddGoalActivity.this,
+                        new DatePickerDialog.OnDateSetListener() {
+                            public void onDateSet(DatePicker datepicker, int selectedYear, int selectedMonth, int selectedDay) {
+                                Calendar myCalendar = Calendar.getInstance();
+                                myCalendar.set(Calendar.YEAR, selectedYear);
+                                myCalendar.set(Calendar.MONTH, selectedMonth);
+                                myCalendar.set(Calendar.DAY_OF_MONTH, selectedDay);
+                                SimpleDateFormat sdf = new SimpleDateFormat();
+                                etDueDate.setText(sdf.format(myCalendar.getTime()));
+                            }
+                        }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show();
+                return true;
+            }
+        });
 
         _image = ((ImageView)findViewById(R.id.image));
         Button btnSetImage = (Button)findViewById(R.id.btnSetImage);
@@ -103,7 +139,7 @@ public class AddGoalActivity extends ActionBarActivity {
 
             Date dueDate = null;
             try {
-                dueDate = DateTimeHelper.ISO8601DateFormat.parse(((EditText) findViewById(R.id.etDueDate)).getText().toString());
+                dueDate = new SimpleDateFormat().parse(((EditText) findViewById(R.id.etDueDate)).getText().toString());
             } catch (ParseException e) {
                 e.printStackTrace();
             }

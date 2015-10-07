@@ -37,4 +37,5 @@
     <string name="title_activity_copy_last_month_budget">CopyLastMonthBudgetActivity</string>
     <string name="title_activity_budget_configuration">Configure Budget</string>
     <string name="title_activity_add_target">Add New Target</string>
+    <string name="remove_goal">Remove Goal</string>
 </resources>

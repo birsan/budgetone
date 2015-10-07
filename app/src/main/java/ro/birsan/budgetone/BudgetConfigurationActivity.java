@@ -3,10 +3,12 @@ package ro.birsan.budgetone;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import ro.birsan.budgetone.adapters.BudgetConfigurationListAdapter;
@@ -42,7 +44,7 @@ implements BudgetConfigurationListAdapter.AdapterCallbacks {
         ExpensesService expensesService = new ExpensesService(transactionsDataSource);
         BudgetService budgetService = new BudgetService(transactionsDataSource, categoriesDataSource, budgetsDataSource);
         ArrayList<BudgetConfigurationViewModel> objects = new ArrayList<>();
-        List<Budget> budgets = BudgetsDataSource.cursorToList(budgetsDataSource.getCurrentMonthBudget());
+        List<Budget> budgets = budgetService.getMonthBudget(new Date());
         _availableAmount = balanceService.getAvailableAmount();
         Double monthIncome = balanceService.getCurrentMonthIncome();
         for(Budget budget: budgets)
@@ -51,7 +53,6 @@ implements BudgetConfigurationListAdapter.AdapterCallbacks {
             Double monthAverage = expensesService.getAverageExpensesPerMonth(budget.getCategoryId());
             Double lastMonthBudget = budgetService.getLastMonthBudget(budget.getCategoryId());
             objects.add(new BudgetConfigurationViewModel(
-                    budget.getId(),
                     budget.getCategoryId(),
                     category.getName(),
                     budget.getTotalAmount(),
@@ -80,12 +81,32 @@ implements BudgetConfigurationListAdapter.AdapterCallbacks {
 
             for (int i = 0; i < _adapter.getCount(); i++) {
                 BudgetConfigurationViewModel model = _adapter.getItem(i);
-                budgetsDataSource.updateBudget(model.get_budgetId(), model.get_amount());
+                budgetsDataSource.updateBudget(model.get_categoryId(), new Date(), model.get_amount());
             }
             budgetsDataSource.close();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        int action = event.getAction();
+        int keyCode = event.getKeyCode();
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                if (action == KeyEvent.ACTION_DOWN) {
+                    _adapter.increaseBudget();
+                }
+                return true;
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                if (action == KeyEvent.ACTION_DOWN) {
+                    _adapter.decreaseBudget();
+                }
+                return true;
+            default:
+                return super.dispatchKeyEvent(event);
+        }
     }
 
     @Override

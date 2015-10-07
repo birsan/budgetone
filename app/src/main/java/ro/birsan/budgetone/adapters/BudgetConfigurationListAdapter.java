@@ -3,7 +3,6 @@ package ro.birsan.budgetone.adapters;
 import android.content.Context;
 import android.text.Html;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -11,7 +10,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
 
@@ -35,6 +33,7 @@ public class BudgetConfigurationListAdapter extends ArrayAdapter<BudgetConfigura
         SeekBar progress;
         ImageView plus;
         ImageView minus;
+        Integer position;
 
         public void showButtons(){
             setVisibility(View.VISIBLE);
@@ -45,10 +44,7 @@ public class BudgetConfigurationListAdapter extends ArrayAdapter<BudgetConfigura
         }
 
         private void setVisibility(int visibility) {
-            progress.setEnabled(visibility == View.VISIBLE);
             dynamicContent.setVisibility(visibility);
-
-            progress.requestLayout();
             dynamicContent.requestLayout();
         }
     }
@@ -67,6 +63,20 @@ public class BudgetConfigurationListAdapter extends ArrayAdapter<BudgetConfigura
         ComputeAmountLeftForBudget();
         scale = getContext().getResources().getDisplayMetrics().density;
         _adapterCallbacks = adapterCallbacks;
+    }
+
+    public void increaseBudget()
+    {
+        BudgetConfigurationViewModel viewModel = getItem(_currentConfiguredViewHolder.position);
+        viewModel.set_amount(viewModel.get_amount() + 1);
+        refreshSeekBars();
+    }
+
+    public void decreaseBudget()
+    {
+        BudgetConfigurationViewModel viewModel = getItem(_currentConfiguredViewHolder.position);
+        viewModel.set_amount(viewModel.get_amount() - 1);
+        refreshSeekBars();
     }
 
     @Override
@@ -93,6 +103,7 @@ public class BudgetConfigurationListAdapter extends ArrayAdapter<BudgetConfigura
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
+        viewHolder.position = position;
         viewHolder.name.setText(viewModel.get_categoryName());
         viewHolder.amount.setText(String.valueOf(viewModel.get_amount().intValue()));
         String tvSuggestedMinText = "<u>" + viewModel.get_suggestedMinAmount().toString() + "</u>";
@@ -175,6 +186,11 @@ public class BudgetConfigurationListAdapter extends ArrayAdapter<BudgetConfigura
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
+                    if (_currentConfiguredViewHolder != viewHolder) {
+                        seekBar.setProgress(seekBar.getProgress() - progress);
+                        viewHolder.relativeLayout.performClick();
+                        return;
+                    }
                     viewModel.set_amount(Double.parseDouble(String.valueOf(progress)));
                     viewHolder.amount.setText(String.valueOf(progress));
                 }

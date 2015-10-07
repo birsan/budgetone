@@ -4,7 +4,6 @@ package ro.birsan.budgetone.viewmodels;
  * Created by Irinel on 9/4/2015.
  */
 public class BudgetConfigurationViewModel {
-    private long _budgetId;
     private long _categoryId;
     private String _categoryName;
     private Double _amount;
@@ -14,7 +13,6 @@ public class BudgetConfigurationViewModel {
     private String _lastMonthBudgetedAmount;
 
     public BudgetConfigurationViewModel(
-            long budgetId,
             long categoryId,
             String categoryName,
             double amount,
@@ -26,7 +24,6 @@ public class BudgetConfigurationViewModel {
         _categoryId = categoryId;
         _categoryName = categoryName;
         _amount = amount;
-        _budgetId = budgetId;
         _suggestedMinAmount = suggestedMinAmount;
         _suggestedMaxAmount = suggestedMaxAmount;
         _monthAverage = monthAverage;
@@ -51,10 +48,6 @@ public class BudgetConfigurationViewModel {
 
     public long get_categoryId() {
         return _categoryId;
-    }
-
-    public long get_budgetId() {
-        return _budgetId;
     }
 
     public String get_categoryName() {

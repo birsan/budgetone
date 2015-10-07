@@ -15,15 +15,18 @@ import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 
 import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 import ro.birsan.budgetone.data.Budget;
 import ro.birsan.budgetone.data.BudgetsDataSource;
+import ro.birsan.budgetone.data.CategoriesDataSource;
 import ro.birsan.budgetone.data.GoalsDataSource;
 import ro.birsan.budgetone.data.IncomesDataSource;
 import ro.birsan.budgetone.data.TransactionsDataSource;
 import ro.birsan.budgetone.services.BalanceService;
+import ro.birsan.budgetone.services.BudgetService;
 import ro.birsan.budgetone.services.GoalsService;
 
 
@@ -214,12 +217,12 @@ public class Dashboard extends AppCompatActivity
             IncomesDataSource incomesDataSource = new IncomesDataSource(_context);
             TransactionsDataSource transactionsDataSource = new TransactionsDataSource(_context);
             BalanceService balanceService = new BalanceService(incomesDataSource, transactionsDataSource);
+            BudgetService budgetService = new BudgetService(transactionsDataSource, new CategoriesDataSource(_context), new BudgetsDataSource(_context));
             if (balanceService.getAvailableAmount() <= 0) {
                 return new NoMonthIncomeFragment();
             }
 
-            BudgetsDataSource budgetsDataSource = new BudgetsDataSource(_context);
-            List<Budget> budgetItems = budgetsDataSource.cursorToList(budgetsDataSource.getCurrentMonthBudget());
+            List<Budget> budgetItems = budgetService.getMonthBudget(new Date());
             if (budgetItems.size() == 0) {
                 return new NoBudgetFragment();
             }
