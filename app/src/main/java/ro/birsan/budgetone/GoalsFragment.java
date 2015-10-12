@@ -1,7 +1,9 @@
 package ro.birsan.budgetone;
 
 
+import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -11,6 +13,7 @@ import android.view.ViewGroup;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import ro.birsan.budgetone.data.BudgetsDataSource;
 import ro.birsan.budgetone.data.CategoriesDataSource;
@@ -26,13 +29,22 @@ import ro.birsan.budgetone.services.GoalsService;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class GoalsFragment extends Fragment {
+public class GoalsFragment extends Fragment implements ViewPager.OnPageChangeListener{
+    private OnFragmentInteractionListener mListener;
     ViewPager _viewPager;
     FragmentStatePagerAdapter _tabsAdapter;
-    //private final GoalsService goalsService = new GoalsService(new GoalsDataSource(getActivity()));
+    GoalsService _goalsService;
+    BudgetService _budgetService;
+    BalanceService _balanceService;
+    List<GoalExt> _goals;
 
     public GoalsFragment() {
         // Required empty public constructor
+    }
+
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mListener.onGoalPageSelected(1, _goals.size());
     }
 
     @Override
@@ -40,18 +52,19 @@ public class GoalsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_goals, container, false);
         final TransactionsDataSource transactionsDataSource = new TransactionsDataSource(getActivity());
-        final GoalsService goalsService = new GoalsService(new GoalsDataSource(getActivity()), transactionsDataSource);
-        BalanceService balanceService = new BalanceService(new IncomesDataSource(getActivity()), transactionsDataSource);
-        BudgetService budgetService = new BudgetService(transactionsDataSource, new CategoriesDataSource(getActivity()), new BudgetsDataSource(getActivity()));
-        Double availableAmount = balanceService.getAvailableAmount();
-        Double budgetedAmount = budgetService.getMonthBudgetedAmount(new Date());
+        _goalsService = new GoalsService(new GoalsDataSource(getActivity()), transactionsDataSource);
+        _balanceService = new BalanceService(new IncomesDataSource(getActivity()), transactionsDataSource);
+        _budgetService = new BudgetService(transactionsDataSource, new CategoriesDataSource(getActivity()), new BudgetsDataSource(getActivity()));
+        _goals = _goalsService.getInProgressGoals();
+        Double availableAmount = _balanceService.getAvailableAmount();
+        Double budgetedAmount = _budgetService.getMonthBudgetedAmount(new Date());
         final Double notBudgetedAmount = availableAmount - budgetedAmount;
 
         _viewPager = (ViewPager) view.findViewById(R.id.pager);
         _tabsAdapter = new FragmentStatePagerAdapter(getFragmentManager()) {
             @Override
             public android.support.v4.app.Fragment getItem(int position) {
-                GoalExt goal = goalsService.getInProgressGoals().get(position);
+                GoalExt goal = _goals.get(position);
                 String dueDate = goal.get_dueDate() != null ? new SimpleDateFormat("dd MMM yyyy").format(goal.get_dueDate()) : "No due date";
                 String availableDesc = "Available (not budgeted) amount is " + notBudgetedAmount.intValue();
                 Bundle args = GoalFragment.buildArguments(
@@ -71,18 +84,53 @@ public class GoalsFragment extends Fragment {
 
             @Override
             public int getCount() {
-                return goalsService.getInProgressGoals().size();
+                return _goals.size();
             }
         };
 
         _viewPager.setAdapter(_tabsAdapter);
+        _viewPager.addOnPageChangeListener(this);
         return view;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (OnFragmentInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement GoalsFragment.OnFragmentInteractionListener");
+        }
     }
 
     private String getAdviceText(GoalExt goal)
     {
-        if (goal.get_advice() <= 0) return "Good job! You are on track";
+        Double currentMonthNotBudgetedAmount = _balanceService.getCurrentMonthIncome() - _budgetService.getMonthBudgetedAmount(new Date());
+        Double recommendedDeposit = _goalsService.getRecommendedDepositForCurrentMonth(goal.get_id(), currentMonthNotBudgetedAmount);
+        if (recommendedDeposit == null) return "Please adjust your budget. Based on current month budget, this goal is not doable till this date.";
 
-        return "Suggestion is to add " + goal.get_advice().intValue() + " more this month.";
+        if (recommendedDeposit == Double.MAX_VALUE) return "No recommendation";
+
+        if (recommendedDeposit <= 0) return "Good job! You are on track";
+
+        return "Suggestion is to add " + recommendedDeposit.intValue() + " more this month.";
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        mListener.onGoalPageSelected(position + 1, _goals.size());
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+    }
+
+    public interface OnFragmentInteractionListener {
+        void onGoalPageSelected(Integer position, Integer count);
     }
 }

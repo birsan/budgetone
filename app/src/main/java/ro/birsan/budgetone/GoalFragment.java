@@ -2,6 +2,7 @@ package ro.birsan.budgetone;
 
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,6 +13,7 @@ import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -85,54 +87,30 @@ public class GoalFragment extends Fragment  implements View.OnClickListener {
     }
 
     public void setProgress(Double progress) {
-        tvProgress.setText(getProgressDescription(progress, _target));
-        _progressBar.setProgress(((Double) ((progress * 100) / _target)).intValue());
         getArguments().putDouble(BUNDLE_PROGRESS_KEY, progress);
+        refreshViews(getView());
+
+        if (_progressBar.getProgress() >= _progressBar.getMax())
+        {
+            new AlertDialog.Builder(getActivity())
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle("Gongrats!")
+                    .setMessage("You achieved your goal")
+                    .show();
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        _goalId = getArguments().getString(BUNDLE_ID_KEY);
-        String name = getArguments().getString(BUNDLE_NAME_KEY);
-        String description = getArguments().getString(BUNDLE_DESCRIPTION_KEY);
-        String dueDate = getArguments().getString(BUNDLE_DUE_DATE_KEY);
-        _target = getArguments().getDouble(BUNDLE_TARGET_KEY);
-        _progress = getArguments().getDouble(BUNDLE_PROGRESS_KEY);
-        String advice = getArguments().getString(BUNDLE_ADVICE_KEY);
-        String availableDesc = getArguments().getString(BUNDLE_AVAILABLE_KEY);
-        byte[] imageTile = getArguments().getByteArray(BUNDLE_IMAGE_KEY);
-        Bitmap bMap = BitmapFactory.decodeByteArray(imageTile, 0, imageTile.length);
         View view = inflater.inflate(R.layout.fragment_goal, container, false);
-        TextView tvName = (TextView) view.findViewById(R.id.tvName);
-        TextView tvDescription = (TextView) view.findViewById(R.id.tvDescription);
-        TextView tvDueDate = (TextView) view.findViewById(R.id.tvDueDate);
-        tvProgress = (TextView) view.findViewById(R.id.tvProgress);
-        _progressBar = (ProgressBar) view.findViewById(R.id.progress);
-        TextView tvAdvice = (TextView) view.findViewById(R.id.tvAdvice);
-        TextView tvAvailableForGoals = (TextView) view.findViewById(R.id.tvAvailableForGoals);
+        refreshViews(view);
         Button btnAdd = (Button) view.findViewById(R.id.btnAdd);
         Button btnTakeBack = (Button) view.findViewById(R.id.btnTakeBack);
         ImageButton btnRemove = (ImageButton) view.findViewById(R.id.btnRemove);
-        ImageView image = (ImageView) view.findViewById(R.id.image);
-        tvName.setText(name);
-        tvDescription.setText(description);
-        tvDueDate.setText(dueDate);
-        tvAdvice.setText(advice);
-        tvAvailableForGoals.setText(availableDesc);
-        if (advice.isEmpty()) {
-            tvAvailableForGoals.setVisibility(View.GONE);
-        }
-
-        tvProgress.setText(getProgressDescription(_progress, _target));
-        _progressBar.setMax(100);
-        _progressBar.setProgress(((Double) ((_progress * 100) / _target)).intValue());
-        image.setImageBitmap(bMap);
-
         btnAdd.setOnClickListener(this);
         btnTakeBack.setOnClickListener(this);
         btnRemove.setOnClickListener(this);
-
         return view;
     }
 
@@ -162,7 +140,12 @@ public class GoalFragment extends Fragment  implements View.OnClickListener {
                     .setView(txtInput)
                     .setPositiveButton("Add", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
-                            onGoalAmount(txtInput.getText().toString());
+                            Double amountToAdd = 0.0;
+                            try {
+                                amountToAdd = Double.valueOf(txtInput.getText().toString());
+                            } catch (NumberFormatException e) {
+                            }
+                            onGoalAmount(amountToAdd, txtInput);
                         }
                     })
                     .setNegativeButton("Cancel", null)
@@ -178,7 +161,12 @@ public class GoalFragment extends Fragment  implements View.OnClickListener {
                     .setView(txtInput)
                     .setPositiveButton("Take Back", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
-                            onGoalAmount(txtInput.getText().toString());
+                            Double amountToAdd = 0.0;
+                            try {
+                                amountToAdd = Double.valueOf(txtInput.getText().toString());
+                            } catch (NumberFormatException e) {
+                            }
+                            onGoalAmount(-1 * amountToAdd, txtInput);
                         }
                     })
                     .setNegativeButton("Cancel", null)
@@ -186,14 +174,8 @@ public class GoalFragment extends Fragment  implements View.OnClickListener {
         }
     }
 
-    private void onGoalAmount(String txtInput)
+    private void onGoalAmount(Double amountToAdd, EditText editText)
     {
-        Double amountToAdd = 0.0;
-        try {
-            amountToAdd = Double.valueOf(txtInput);
-        } catch (NumberFormatException e) {
-        }
-
         if (amountToAdd == 0) {
             Toast.makeText(getActivity(), "Enter an amount grater than 0", Toast.LENGTH_LONG).show();
             return;
@@ -205,7 +187,45 @@ public class GoalFragment extends Fragment  implements View.OnClickListener {
             return;
         }
 
+        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
         _listener.onGoalAmountSubmitted(this, _goalId, amountToAdd);
+    }
+
+    private void refreshViews(View view) {
+        _goalId = getArguments().getString(BUNDLE_ID_KEY);
+        String name = getArguments().getString(BUNDLE_NAME_KEY);
+        String description = getArguments().getString(BUNDLE_DESCRIPTION_KEY);
+        String dueDate = getArguments().getString(BUNDLE_DUE_DATE_KEY);
+        _target = getArguments().getDouble(BUNDLE_TARGET_KEY);
+        _progress = getArguments().getDouble(BUNDLE_PROGRESS_KEY);
+        String advice = getArguments().getString(BUNDLE_ADVICE_KEY);
+        String availableDesc = getArguments().getString(BUNDLE_AVAILABLE_KEY);
+        byte[] imageTile = getArguments().getByteArray(BUNDLE_IMAGE_KEY);
+        Bitmap bMap = BitmapFactory.decodeByteArray(imageTile, 0, imageTile.length);
+
+        TextView tvName = (TextView) view.findViewById(R.id.tvName);
+        TextView tvDescription = (TextView) view.findViewById(R.id.tvDescription);
+        TextView tvDueDate = (TextView) view.findViewById(R.id.tvDueDate);
+        tvProgress = (TextView) view.findViewById(R.id.tvProgress);
+        _progressBar = (ProgressBar) view.findViewById(R.id.progress);
+        TextView tvAdvice = (TextView) view.findViewById(R.id.tvAdvice);
+        TextView tvAvailableForGoals = (TextView) view.findViewById(R.id.tvAvailableForGoals);
+        ImageView image = (ImageView) view.findViewById(R.id.image);
+
+        tvName.setText(name);
+        tvDescription.setText(description);
+        tvDueDate.setText(dueDate);
+        tvAdvice.setText(advice);
+        tvAvailableForGoals.setText(availableDesc);
+        if (advice.isEmpty()) {
+            tvAvailableForGoals.setVisibility(View.GONE);
+        }
+
+        tvProgress.setText(getProgressDescription(_progress, _target));
+        _progressBar.setMax(100);
+        _progressBar.setProgress(((Double) ((_progress * 100) / _target)).intValue());
+        image.setImageBitmap(bMap);
     }
 
     private String getProgressDescription(Double progress, Double target)

@@ -31,7 +31,7 @@ import ro.birsan.budgetone.services.GoalsService;
 
 
 public class Dashboard extends AppCompatActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks, CalculatorFragment.OnFragmentInteractionListener, GoalFragment.OnFragmentInteractionListener{
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks, CalculatorFragment.OnFragmentInteractionListener, GoalFragment.OnFragmentInteractionListener, GoalsFragment.OnFragmentInteractionListener{
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -99,9 +99,8 @@ public class Dashboard extends AppCompatActivity
             case 3:
                 mTitle = getString(R.string.title_section_chart);
                 break;
-            case 4:
-                mTitle = getString(R.string.title_section_goals);
-                break;
+            default:
+                return;
         }
 
         ActionBar actionBar = getSupportActionBar();
@@ -109,7 +108,6 @@ public class Dashboard extends AppCompatActivity
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(mTitle);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -189,6 +187,12 @@ public class Dashboard extends AppCompatActivity
         GoalsService goalsService = new GoalsService(new GoalsDataSource(this), new TransactionsDataSource(this));
         goalsService.removeGoal(goalId);
         Refresh();
+    }
+
+    @Override
+    public void onGoalPageSelected(Integer position, Integer count) {
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(getString(R.string.title_section_goals) + " " + position + "/" + count);
     }
 
     /**

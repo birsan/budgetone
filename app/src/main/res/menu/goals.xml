@@ -2,5 +2,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/add_target" android:title="@string/action_add_target"
-        android:orderInCategory="50" app:showAsAction="ifRoom" />
+        android:orderInCategory="50" app:showAsAction="always|withText"
+        app:icon="@drawable/add_new" android:icon="@drawable/add_new"/>
 </menu>
