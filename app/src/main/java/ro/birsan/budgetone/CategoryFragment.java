@@ -2,17 +2,14 @@ package ro.birsan.budgetone;
 
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ExpandableListView;
 
-import java.util.List;
-
-import ro.birsan.budgetone.adapters.ExpandableCategoriesListAdapter;
 import ro.birsan.budgetone.data.CategoriesDataSource;
-import ro.birsan.budgetone.data.Category;
-import ro.birsan.budgetone.data.MySQLiteHelper;
+import ro.birsan.budgetone.widgets.NonSwipeableViewPager;
 
 
 /**
@@ -20,46 +17,73 @@ import ro.birsan.budgetone.data.MySQLiteHelper;
  */
 public class CategoryFragment extends Fragment {
 
+    NonSwipeableViewPager _viewPager;
 
-    private ExpandableCategoriesListAdapter _adapter;
-    private ExpandableListView expListView;
-
-    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        expListView = (ExpandableListView)getActivity().findViewById(R.id.categories_expandable_list);
-        _adapter = new ExpandableCategoriesListAdapter(getActivity(), getData());
-        expListView.setAdapter(_adapter);
-
-        expListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
-            @Override
-            public void onGroupExpand(int groupPosition) {
-            }
-        });
-
-        expListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
-            @Override
-            public void onGroupCollapse(int groupPosition) {
-            }
-        });
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_cateories_list, container, false);
-    }
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_categories, container, false);
 
-    private List<Category> getData()
-    {
-        CategoriesDataSource categoriesDataSource = new CategoriesDataSource(getActivity());
-        List<Category> categories = categoriesDataSource.getCategories(Category.TABLE_CATEGORIES_COLUMN_PARENT_CATEGORY + " IS NULL ", null);
-        for (int i = 0; i < categories.size(); i++)
-        {
-            Category category = categories.get(i);
-            List<Category> subcategories = categoriesDataSource.getSubcategoriesOf(category.getId());
-            category.setSubcategories(subcategories);
-        }
+        _viewPager = (NonSwipeableViewPager) view.findViewById(R.id.pager);
+        final FragmentCategoriesList fragmentCategoriesList = FragmentCategoriesList.newInstance(FragmentCategoriesList.TOP_LEVEL_PARENT_ID, "Add Category");
+        final FragmentCategoriesList fragmentSubcategoriesList = FragmentCategoriesList.newInstance(FragmentCategoriesList.TOP_LEVEL_PARENT_ID, "Add Subcategory");
+        final FragmentStatePagerAdapter tabsAdapter = new FragmentStatePagerAdapter(getFragmentManager()) {
+            @Override
+            public Fragment getItem(int position) {
+                return position == 0 ? fragmentCategoriesList : fragmentSubcategoriesList;
+            }
 
-        return categories;
+            @Override
+            public int getCount() {
+                return 2;
+            }
+        };
+
+        FragmentCategoriesList.OnFragmentInteractionListener listener = new FragmentCategoriesList.OnFragmentInteractionListener() {
+            @Override
+            public void onCategoryAdded(String categoryName, Long parentId) {
+                CategoriesDataSource categoriesDataSource = new CategoriesDataSource(getActivity());
+                if (parentId == FragmentCategoriesList.TOP_LEVEL_PARENT_ID) {
+                    categoriesDataSource.createCategory(categoryName);
+                    fragmentCategoriesList.refreshData();
+                } else {
+                    categoriesDataSource.addSubcategory(categoryName, parentId);
+                    fragmentSubcategoriesList.refreshData();
+                }
+            }
+
+            @Override
+            public void onCategorySelected(Long categoryId) {
+                if (_viewPager.getCurrentItem() == 1) return;
+
+                fragmentSubcategoriesList.setParentCategoryId(categoryId);
+                _viewPager.setCurrentItem(1, true);
+            }
+        };
+
+        fragmentCategoriesList.setListener(listener);
+        fragmentSubcategoriesList.setListener(listener);
+
+        view.setFocusableInTouchMode(true);
+        view.requestFocus();
+        view.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    if (_viewPager.getCurrentItem() == 0) return false;
+
+                    _viewPager.setCurrentItem(0, true);
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        _viewPager.setAdapter(tabsAdapter);
+        return view;
     }
 }

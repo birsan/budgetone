@@ -16,6 +16,13 @@ public class CategoriesDataSource extends DataSourceBase {
         super(context);
     }
 
+    public void addSubcategory(String subcategoryName, long parentCategoryId) {
+        ContentValues values = new ContentValues();
+        values.put(Category.TABLE_CATEGORIES_COLUMN_NAME, subcategoryName);
+        values.put(Category.TABLE_CATEGORIES_COLUMN_PARENT_CATEGORY, parentCategoryId);
+        _writableDatabase.insert(Category.TABLE_CATEGORIES, null, values);
+    }
+
     public Category createCategory(String categoryName) {
         ContentValues values = new ContentValues();
         values.put(Category.TABLE_CATEGORIES_COLUMN_NAME, categoryName);
