@@ -1,6 +1,8 @@
 package ro.birsan.budgetone.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,7 +50,8 @@ public class BudgetArrayAdapter extends ArrayAdapter<BudgetViewModel> {
 
         viewHolder.name.setText(viewModel.get_categoryName());
         viewHolder.amount.setText(viewModel.get_leftAmountDisplay());
-        viewHolder.progress.setProgress((int)(viewModel.get_consumedAmount() * 100 / viewModel.get_totalAmount()));
+        viewHolder.progress.setProgress((int) (viewModel.get_consumedAmount() * 100 / viewModel.get_totalAmount()));
+        viewHolder.progress.getProgressDrawable().setColorFilter(viewModel.get_color(), PorterDuff.Mode.SRC_IN);
 
         return convertView;
     }

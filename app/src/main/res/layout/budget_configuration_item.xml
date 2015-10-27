@@ -42,28 +42,7 @@
         android:layout_alignEnd="@+id/amount"
         android:id="@+id/dynamicContent">
 
-    <ImageView
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:id="@+id/btnPlus"
-        android:clickable="true"
-        android:src="@drawable/plus"
-        android:contentDescription="Plus"
-        android:layout_marginTop="10dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignTop="@+id/tvLastMonth" />
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/btnMinus"
-        android:src="@drawable/minus"
-        android:layout_alignLeft="@+id/btnPlus"
-        android:layout_below="@+id/btnPlus"
-        android:layout_marginTop="15dp" />
-
-    <TextView
+        <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="tvSuggestedMin"
@@ -96,7 +75,6 @@
         android:layout_height="wrap_content"
         android:text="Last month budget:"
         android:id="@+id/tvLastMonthLabel"
-        android:layout_below="@+id/seekBar"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginTop="8dp" />

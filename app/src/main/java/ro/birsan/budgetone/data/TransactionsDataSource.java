@@ -3,6 +3,7 @@ package ro.birsan.budgetone.data;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -63,12 +64,11 @@ public class TransactionsDataSource extends DataSourceBase {
         return amount;
     }
 
-    public List<Transaction> getAllTransactionsForCurrentMonth() {
-        Calendar c = Calendar.getInstance();
+    public List<Transaction> getAllTransactionsByMonth(int year, int month) {
         String query = "SELECT * "
                 + " from " + Transaction.TABLE_NAME
-                + " WHERE CAST(strftime('%Y', " + Transaction.COLUMN_CREATED_ON + ") AS decimal) = " + c.get(Calendar.YEAR)
-                + " AND CAST(strftime('%m', " + Transaction.COLUMN_CREATED_ON + ") AS decimal) = " + (c.get(Calendar.MONTH) + 1)
+                + " WHERE CAST(strftime('%Y', " + Transaction.COLUMN_CREATED_ON + ") AS decimal) = " + year
+                + " AND CAST(strftime('%m', " + Transaction.COLUMN_CREATED_ON + ") AS decimal) = " + month
                 + " ORDER BY " + Transaction.COLUMN_CREATED_ON + " DESC;";
         Cursor cursor = _readableDatabase.rawQuery(query, null);
         return cursorToList(cursor);
@@ -120,5 +120,30 @@ public class TransactionsDataSource extends DataSourceBase {
 
         cursor.close();
         return amount;
+    }
+
+    public Double getTransactionsAmountByMonth(Date date) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        String query = "SELECT sum(" + Transaction.COLUMN_AMOUNT + ") from " + Transaction.TABLE_NAME
+                + " WHERE CAST(strftime('%Y', " + Transaction.COLUMN_CREATED_ON + ") AS decimal) = " + c.get(Calendar.YEAR)
+                + " AND CAST(strftime('%m', " + Transaction.COLUMN_CREATED_ON + ") AS decimal) = " + (c.get(Calendar.MONTH) + 1) + ";";
+        Cursor cursor = _readableDatabase.rawQuery(query, null);
+        cursor.moveToFirst();
+        double amount = 0.0;
+        if (!cursor.isAfterLast())
+        {
+            amount = cursor.getDouble(0);
+        }
+
+        cursor.close();
+        return amount;
+    }
+
+    public int getTransactionsCountByCategory(long categoryId) {
+        //TODO: query also for subcategories
+        String query = "SELECT COUNT(*) FROM " + Transaction.TABLE_NAME
+                + " WHERE " + Transaction.COLUMN_CATEGORY_ID + " = " + categoryId;
+        return (int)DatabaseUtils.longForQuery(_readableDatabase, query, null);
     }
 }

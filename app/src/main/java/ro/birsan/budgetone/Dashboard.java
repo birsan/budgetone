@@ -120,6 +120,9 @@ public class Dashboard extends AppCompatActivity
                 case 0:
                     getMenuInflater().inflate(R.menu.dashboard, menu);
                     break;
+                case 1:
+                    getMenuInflater().inflate(R.menu.history, menu);
+                    break;
                 case 4:
                     getMenuInflater().inflate(R.menu.goals, menu);
                     break;
@@ -213,7 +216,7 @@ public class Dashboard extends AppCompatActivity
          * number.
          */
         public static Fragment newInstance(int sectionNumber) {
-            if (sectionNumber == 1) return new HistoryFragmentTabHost();
+            if (sectionNumber == 1) return new HistoryFragment();
             if (sectionNumber == 2) return new CategoryFragment();
             if (sectionNumber == 3) return new ChartFragment();
             if (sectionNumber == 4) return new GoalsFragment();

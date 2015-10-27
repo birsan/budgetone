@@ -39,4 +39,11 @@
     <string name="title_activity_add_target">Add New Target</string>
     <string name="remove_goal">Remove Goal</string>
     <string name="add_subcategory">Add Subcategory</string>
+    <string name="history_type_expenses">Expenses</string>
+    <string name="history_type_income">Income</string>
+    <string name="txt_history_filter_year">Year:</string>
+    <string name="txt_history_filter_month">Month:</string>
+    <string name="txt_history_filter_category">Category/Goal:</string>
+    <string name="txt_history_filter_subcategory">Subcategory:</string>
+    <string name="budget_configuration_welcome_toast">Use volume keys for fine tuning!</string>
 </resources>

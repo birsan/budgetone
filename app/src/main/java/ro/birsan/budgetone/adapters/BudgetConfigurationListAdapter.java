@@ -1,12 +1,14 @@
 package ro.birsan.budgetone.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.provider.CalendarContract;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -31,8 +33,6 @@ public class BudgetConfigurationListAdapter extends ArrayAdapter<BudgetConfigura
         TextView tvExpensesAverage;
         TextView tvLastMonth;
         SeekBar progress;
-        ImageView plus;
-        ImageView minus;
         Integer position;
 
         public void showButtons(){
@@ -96,8 +96,6 @@ public class BudgetConfigurationListAdapter extends ArrayAdapter<BudgetConfigura
             viewHolder.tvExpensesAverage = (TextView) convertView.findViewById(R.id.tvExpensesAverage);
             viewHolder.tvLastMonth = (TextView) convertView.findViewById(R.id.tvLastMonth);
             viewHolder.progress = (SeekBar) convertView.findViewById(R.id.seekBar);
-            viewHolder.plus = (ImageView) convertView.findViewById(R.id.btnPlus);
-            viewHolder.minus = (ImageView) convertView.findViewById(R.id.btnMinus);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -114,8 +112,10 @@ public class BudgetConfigurationListAdapter extends ArrayAdapter<BudgetConfigura
         viewHolder.tvSuggestedMax.setText(Html.fromHtml(tvSuggestedMaxText));
         viewHolder.tvExpensesAverage.setText(Html.fromHtml(expensesAverageText));
         viewHolder.tvLastMonth.setText(Html.fromHtml(lastMonthText));
-        viewHolder.progress.setMax(_amountLeftForBudget.intValue() + viewModel.get_amount().intValue());
+        int maxAmount = _amountLeftForBudget.intValue() + viewModel.get_amount().intValue();
+        viewHolder.progress.setMax(maxAmount);
         viewHolder.progress.setProgress(viewModel.get_amount().intValue());
+        viewHolder.progress.incrementProgressBy(maxAmount / 100);
         viewHolder.progress.setEnabled(viewHolder.progress.getMax() > 0);
         viewHolder.relativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -165,20 +165,6 @@ public class BudgetConfigurationListAdapter extends ArrayAdapter<BudgetConfigura
             @Override
             public void onClick(View v) {
                 setAmount(viewModel, viewModel.get_suggestedMaxAmount());
-            }
-        });
-
-        viewHolder.plus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setAmount(viewModel, viewModel.get_amount() + 1);
-            }
-        });
-
-        viewHolder.minus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setAmount(viewModel, viewModel.get_amount() - 1);
             }
         });
 

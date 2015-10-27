@@ -1,6 +1,7 @@
 package ro.birsan.budgetone.services;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import ro.birsan.budgetone.data.Income;
@@ -17,6 +18,11 @@ public class BalanceService {
     public BalanceService(IncomesDataSource incomesDataSource, TransactionsDataSource transactionsDataSource) {
         _incomesDataSource = incomesDataSource;
         _transactionsDataSource = transactionsDataSource;
+    }
+
+    public Double getAmountToBudgetCurrentMonth()
+    {
+        return getAvailableAmount() + _transactionsDataSource.getTransactionsAmountByMonth(new Date());
     }
 
     public Double getAvailableAmount()

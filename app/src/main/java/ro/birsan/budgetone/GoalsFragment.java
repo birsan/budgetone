@@ -56,9 +56,8 @@ public class GoalsFragment extends Fragment implements ViewPager.OnPageChangeLis
         _balanceService = new BalanceService(new IncomesDataSource(getActivity()), transactionsDataSource);
         _budgetService = new BudgetService(transactionsDataSource, new CategoriesDataSource(getActivity()), new BudgetsDataSource(getActivity()));
         _goals = _goalsService.getInProgressGoals();
-        Double availableAmount = _balanceService.getAvailableAmount();
         Double budgetedAmount = _budgetService.getMonthBudgetedAmount(new Date());
-        final Double notBudgetedAmount = availableAmount - budgetedAmount;
+        final Double notBudgetedAmount = _balanceService.getAmountToBudgetCurrentMonth() - budgetedAmount;
 
         _viewPager = (ViewPager) view.findViewById(R.id.pager);
         _tabsAdapter = new FragmentStatePagerAdapter(getFragmentManager()) {

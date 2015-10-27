@@ -1,5 +1,7 @@
 package ro.birsan.budgetone.viewmodels;
 
+import android.graphics.Color;
+
 /**
  * Created by Irinel on 9/3/2015.
  */
@@ -31,6 +33,16 @@ public class BudgetViewModel {
 
     public Double get_consumedAmount() {
         return _consumedAmount;
+    }
+
+    public int get_color() {
+
+        Double consumedPercentage = _consumedAmount * 100 / _totalAmount;
+        if (consumedPercentage > 80) return Color.parseColor("#e74c3c");
+
+        if (consumedPercentage > 50) return Color.parseColor("#f39c12");
+
+        return Color.parseColor("#16a085");
     }
 
     /**

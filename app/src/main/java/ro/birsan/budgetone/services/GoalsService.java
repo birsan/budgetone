@@ -58,6 +58,12 @@ public class GoalsService implements Closeable {
                 inProgressGoals.add(goalExt);
             }
         }
+        Collections.sort(inProgressGoals, new Comparator<GoalExt>() {
+            @Override
+            public int compare(GoalExt lhs, GoalExt rhs) {
+                return lhs.get_dueDate().compareTo(rhs.get_dueDate());
+            }
+        });
         return inProgressGoals;
     }
 

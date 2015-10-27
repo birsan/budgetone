@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,7 +46,7 @@ implements BudgetConfigurationListAdapter.AdapterCallbacks {
         BudgetService budgetService = new BudgetService(transactionsDataSource, categoriesDataSource, budgetsDataSource);
         ArrayList<BudgetConfigurationViewModel> objects = new ArrayList<>();
         List<Budget> budgets = budgetService.getMonthBudget(new Date());
-        _availableAmount = balanceService.getAvailableAmount();
+        _availableAmount = balanceService.getAmountToBudgetCurrentMonth();
         Double monthIncome = balanceService.getCurrentMonthIncome();
         for(Budget budget: budgets)
         {
@@ -70,6 +71,8 @@ implements BudgetConfigurationListAdapter.AdapterCallbacks {
         actionBar.setTitle(R.string.title_activity_budget_configuration);
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeAsUpIndicator(R.drawable.check);
+
+        Toast.makeText(this, getString(R.string.budget_configuration_welcome_toast), Toast.LENGTH_LONG).show();
     }
 
     @Override

@@ -17,6 +17,7 @@ import java.util.List;
 
 import ro.birsan.budgetone.data.CategoriesDataSource;
 import ro.birsan.budgetone.data.Category;
+import ro.birsan.budgetone.services.CategoriesService;
 
 
 /**
@@ -146,17 +147,17 @@ implements AdapterView.OnItemClickListener, View.OnClickListener {
 
     private List<Category> getData(long parentId)
     {
-        CategoriesDataSource categoriesDataSource = new CategoriesDataSource(getActivity());
+        CategoriesService categoriesService = new CategoriesService(new CategoriesDataSource(getActivity()));
         List<Category> categories;
         if (parentId == -1)
-            categories = categoriesDataSource.getCategories(Category.TABLE_CATEGORIES_COLUMN_PARENT_CATEGORY + " IS NULL ", null);
+            categories = categoriesService.getAllCategories();
         else
-            categories = categoriesDataSource.getCategories(Category.TABLE_CATEGORIES_COLUMN_PARENT_CATEGORY + " = ? ", new String[]{String.valueOf(parentId)});
+            categories = categoriesService.getAllSubcategories(parentId);
 
         for (int i = 0; i < categories.size(); i++)
         {
             Category category = categories.get(i);
-            List<Category> subcategories = categoriesDataSource.getSubcategoriesOf(category.getId());
+            List<Category> subcategories = categoriesService.getAllSubcategories(category.getId());
             category.setSubcategories(subcategories);
         }
 

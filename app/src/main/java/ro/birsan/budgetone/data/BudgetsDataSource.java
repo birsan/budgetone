@@ -3,6 +3,7 @@ package ro.birsan.budgetone.data;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;

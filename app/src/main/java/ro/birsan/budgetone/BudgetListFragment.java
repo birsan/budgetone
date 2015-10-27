@@ -14,6 +14,8 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -61,12 +63,20 @@ public class BudgetListFragment extends Fragment{
 
         CategoriesDataSource categoriesDataSource = new CategoriesDataSource(getActivity());
         BudgetsDataSource budgetsDataSource = new BudgetsDataSource(getActivity());
-        TransactionsDataSource  transactionsDataSource = new TransactionsDataSource(getActivity());
+        final TransactionsDataSource  transactionsDataSource = new TransactionsDataSource(getActivity());
 
         BudgetService budgetService = new BudgetService(transactionsDataSource, categoriesDataSource, budgetsDataSource);
 
         List<BudgetViewModel> viewModels = new ArrayList<>();
         List<Budget> budgets = budgetService.getMonthBudget(new Date());
+        Collections.sort(budgets, new Comparator<Budget>() {
+            @Override
+            public int compare(Budget lhs, Budget rhs) {
+                Integer lAmount = transactionsDataSource.getTransactionsCountByCategory(lhs.getCategoryId());
+                Integer rAmount = transactionsDataSource.getTransactionsCountByCategory(rhs.getCategoryId());
+                return rAmount.compareTo(lAmount);
+            }
+        });
         for(Budget budget: budgets)
         {
             double budgetExpenses = budgetService.getTotalExpensesForCurrentMonth(budget.getCategoryId());
