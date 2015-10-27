@@ -141,7 +141,6 @@ public class TransactionsDataSource extends DataSourceBase {
     }
 
     public int getTransactionsCountByCategory(long categoryId) {
-        //TODO: query also for subcategories
         String query = "SELECT COUNT(*) FROM " + Transaction.TABLE_NAME
                 + " WHERE " + Transaction.COLUMN_CATEGORY_ID + " = " + categoryId;
         return (int)DatabaseUtils.longForQuery(_readableDatabase, query, null);

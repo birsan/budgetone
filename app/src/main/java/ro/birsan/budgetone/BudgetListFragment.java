@@ -26,6 +26,7 @@ import ro.birsan.budgetone.data.CategoriesDataSource;
 import ro.birsan.budgetone.data.Category;
 import ro.birsan.budgetone.data.TransactionsDataSource;
 import ro.birsan.budgetone.services.BudgetService;
+import ro.birsan.budgetone.services.TransactionsService;
 import ro.birsan.budgetone.viewmodels.BudgetViewModel;
 
 public class BudgetListFragment extends Fragment{
@@ -66,14 +67,15 @@ public class BudgetListFragment extends Fragment{
         final TransactionsDataSource  transactionsDataSource = new TransactionsDataSource(getActivity());
 
         BudgetService budgetService = new BudgetService(transactionsDataSource, categoriesDataSource, budgetsDataSource);
+        final TransactionsService transactionsService = new TransactionsService(transactionsDataSource, categoriesDataSource);
 
         List<BudgetViewModel> viewModels = new ArrayList<>();
         List<Budget> budgets = budgetService.getMonthBudget(new Date());
         Collections.sort(budgets, new Comparator<Budget>() {
             @Override
             public int compare(Budget lhs, Budget rhs) {
-                Integer lAmount = transactionsDataSource.getTransactionsCountByCategory(lhs.getCategoryId());
-                Integer rAmount = transactionsDataSource.getTransactionsCountByCategory(rhs.getCategoryId());
+                Integer lAmount = transactionsService.getTransactionsCountByCategory(lhs.getCategoryId());
+                Integer rAmount = transactionsService.getTransactionsCountByCategory(rhs.getCategoryId());
                 return rAmount.compareTo(lAmount);
             }
         });
